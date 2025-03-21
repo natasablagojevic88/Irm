@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="https://jakarta.ee/xml/ns/jakartaee"
+	xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+	id="WebApp_ID" version="5.0">
+	<display-name>Irm</display-name>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+	</welcome-file-list>
+
+	<servlet>
+		<servlet-name>Irm</servlet-name>
+		<servlet-class>rs.irm.Irm</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>SwaggerServlet</servlet-name>
+		<servlet-class>rs.irm.utils.SwaggerServlet</servlet-class>
+	</servlet>
+
+	<listener>
+		<listener-class>rs.irm.utils.CustomServletContextListener</listener-class>
+	</listener>
+
+	<filter>
+		<filter-name>CustomFilter</filter-name>
+		<filter-class>rs.irm.utils.CustomFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>CustomFilter</filter-name>
+		<url-pattern>/api/*</url-pattern>
+	</filter-mapping>
+
+</web-app>

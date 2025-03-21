@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Irm" basedir="." default="war">
+
+	<property name="src.dir" value="src" />
+	<property name="build.dir" value="build" />
+	<property name="dist.dir" value="dist" />
+	<property name="wepapp.dir" value="src/main/webapp" />
+	<property name="webinf.dir" value="${wepapp.dir}/WEB-INF" />
+	<property name="lib.dir" value="${webinf.dir}/lib" />
+	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="metainf.dir" value="${wepapp.dir}/META-INF" />
+	<property name="war.file" value="${dist.dir}/Irm.war" />
+	<property name="distwebinf.dir" value="${dist.dir}/WEB-INF" />
+	<property name="distclases.dir"
+		value="${distwebinf.dir}/classes" />
+	<property name="resources.dir" value="resources" />
+	<property name="front.dir" value="../IrmFront/" />
+	<property name="browser.dir" value="${front.dir}/dist/Irm/browser" />
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<target name="init" depends="clean">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${classes.dir}" />
+	</target>
+
+	<target name="compilecode" depends="init">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}">
+			<classpath>
+				<fileset dir="${lib.dir}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="copy-web" depends="compilecode">
+		<copy todir="${dist.dir}">
+			<fileset dir="${wepapp.dir}" />
+		</copy>
+	</target>
+
+	<target name="copy-classes" depends="copy-web">
+		<copy todir="${distwebinf.dir}">
+			<fileset dir="${build.dir}" />
+		</copy>
+	</target>
+
+	<target name="copy-resources" depends="copy-classes">
+		<copy todir="${distclases.dir}">
+			<fileset dir="${resources.dir}" />
+		</copy>
+	</target>
+
+	<target name="npm-install" depends="copy-resources">
+		<exec executable="npm">
+			<arg value="--prefix" />
+			<arg value="${front.dir}" />
+			<arg value="install" />
+		</exec>
+	</target>
+	
+	<target name="npm-compile" depends="npm-install">
+		<exec executable="npm">
+			<arg value="--prefix" />
+			<arg value="${front.dir}" />
+			<arg value="run" />
+			<arg value="build" />
+		</exec>
+	</target>
+
+	<target name="copy-browser" depends="npm-compile">
+		<copy todir="${dist.dir}">
+			<fileset dir="${browser.dir}" />
+		</copy>
+	</target>
+
+	<target name="war" depends="copy-browser">
+		<war destfile="${war.file}" webxml="${webinf.dir}/web.xml">
+			<fileset dir="${dist.dir}" />
+		</war>
+	</target>
+
+
+</project>

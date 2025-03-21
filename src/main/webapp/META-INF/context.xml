@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+
+	<Resource name="jdbc/postgres" auth="Container"
+		type="javax.sql.DataSource" maxTotal="100" maxIdle="100"
+		username="nbirm" password="nbirm"
+		driverClassName="org.postgresql.Driver"
+		url="jdbc:postgresql://localhost:5432/nbirm" />
+
+	<Environment name="production"
+		type="java.lang.Boolean" value="false" />
+
+	<Environment name="numofconnections"
+		type="java.lang.Integer" value="5" />
+
+	<Environment name="baseurl" type="java.lang.String"
+		value="/Irm" />
+
+	<Environment name="checkconnection" type="java.lang.String"
+		value="select 1" />
+
+	<Environment name="sessionduration" type="java.lang.Long"
+		value="604800000" />
+
+	<!-- srRS , srLatnRS , enUS -->
+	<Environment name="defaultlang" type="java.lang.String"
+		value="srRS" />
+
+	<!-- dev , production -->
+	<Environment name="keystoretype" type="java.lang.String"
+		value="dev" />
+
+	<Environment name="jasperfilepath" type="java.lang.String"
+		value=".jasperReports" />
+
+	<Environment name="jasperreportpath"
+		type="java.lang.String" value=".jasperReportsReport" />
+
+	<Environment name="checkconnectioncron"
+		type="java.lang.String" value="0 0 1 * * ?" />
+
+	<Environment name="jobdateformat" type="java.lang.String"
+		value="yyyyMMdd" />
+
+	<Environment name="jobdatetimeformat"
+		type="java.lang.String" value="yyyyMMddHHmmss" />
+
+</Context>
