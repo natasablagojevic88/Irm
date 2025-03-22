@@ -25,6 +25,7 @@ import rs.irm.administration.dto.FileUploadPathDTO;
 import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.dto.ModelJasperReportDTO;
+import rs.irm.administration.dto.ModelProcedureDTO;
 import rs.irm.administration.dto.ModelTriggerDTO;
 import rs.irm.administration.dto.NextRowColumnDTO;
 import rs.irm.administration.service.ModelService;
@@ -328,6 +329,56 @@ public class ModelController {
 			@PathParam("modelid") Long modelID
 		) {
 		return Response.ok(modelService.getJobs(tableParameterDTO, modelID)).build();
+	}
+	
+	@POST
+	@Path("/procedure/table/{modelid}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
+	@RolesAllowed("admin")
+	@SecurityRequirement(name = "JWT")
+	public Response getProcedureTable(
+			TableParameterDTO tableParameterDTO, 
+			@PathParam("modelid") Long modelId
+		) {
+		return Response.ok(modelService.getProceduresTable(tableParameterDTO, modelId)).build();
+	}
+	
+	@GET
+	@Path("/procedures")
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))
+	@RolesAllowed("admin")
+	@SecurityRequirement(name = "JWT")
+	public Response getProcedures(
+		) {
+		return Response.ok(modelService.getProcedures()).build();
+	}
+	
+	@POST
+	@Path("/procedure/update")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ComboboxDTO.class)))
+	@RolesAllowed("admin")
+	@SecurityRequirement(name = "JWT")
+	public Response getProcedureUpdate(
+			@Valid ModelProcedureDTO modelProcedureDTO
+		) {
+		return Response.ok(modelService.getUpdateProcedure(modelProcedureDTO)).build();
+	}
+	
+	@DELETE
+	@Path("/procedure/delete/{id}")
+	@ApiResponse(responseCode = "204", description = "No content")
+	@RolesAllowed("admin")
+	@SecurityRequirement(name = "JWT")
+	public Response getProcedureDelete(
+			@PathParam("id") Long id
+		) {
+		this.modelService.getProcedureDelete(id);
+		return Response.noContent().build();
 	}
 
 }

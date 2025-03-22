@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +23,7 @@ import rs.irm.administration.dto.CheckParentDTO;
 import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.dto.ModelJasperReportDTO;
+import rs.irm.administration.dto.ModelProcedureDTO;
 import rs.irm.administration.dto.ModelTriggerDTO;
 import rs.irm.administration.dto.NextRowColumnDTO;
 import rs.irm.administration.dto.ReportJobDTO;
@@ -28,6 +31,7 @@ import rs.irm.administration.dto.RoleDTO;
 import rs.irm.administration.entity.Model;
 import rs.irm.administration.entity.ModelColumn;
 import rs.irm.administration.entity.ModelJasperReport;
+import rs.irm.administration.entity.ModelProcedure;
 import rs.irm.administration.enums.ModelType;
 import rs.irm.administration.service.ModelService;
 import rs.irm.administration.utils.CreateModel;
@@ -37,6 +41,7 @@ import rs.irm.administration.utils.DeleteModelColumn;
 import rs.irm.administration.utils.DeleteTrigger;
 import rs.irm.administration.utils.FindColumns;
 import rs.irm.administration.utils.FindFunctions;
+import rs.irm.administration.utils.FindProcedures;
 import rs.irm.administration.utils.ModelJasperReportDelete;
 import rs.irm.administration.utils.ModelJasperReportUpdate;
 import rs.irm.administration.utils.RefreshModel;
@@ -342,16 +347,16 @@ public class ModelServiceImpl implements ModelService {
 
 		for (ModelJasperReport jasperReport : jasperReports) {
 			byte[] bytes = jasperReport.getBytes();
-			
-			String jasperFolderPath=AppParameters.jasperfilepath;
-			
-			File jasperFolderFolder=new File(jasperFolderPath);
-			if(!(jasperFolderFolder.exists()&&jasperFolderFolder.isDirectory())) {
+
+			String jasperFolderPath = AppParameters.jasperfilepath;
+
+			File jasperFolderFolder = new File(jasperFolderPath);
+			if (!(jasperFolderFolder.exists() && jasperFolderFolder.isDirectory())) {
 				jasperFolderFolder.mkdirs();
 			}
-			
-			Path jasperPath=Paths.get(jasperFolderPath+"/"+jasperReport.getJasperFileName());
-			
+
+			Path jasperPath = Paths.get(jasperFolderPath + "/" + jasperReport.getJasperFileName());
+
 			try {
 				Files.copy(new ByteArrayInputStream(bytes), jasperPath, StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
@@ -368,12 +373,44 @@ public class ModelServiceImpl implements ModelService {
 	}
 
 	@Override
-	public TableDataDTO<ReportJobDTO> getJobs(TableParameterDTO tableParameterDTO,Long modelID) {
-		
-		tableParameterDTO.getTableFilters().add(new TableFilter("modelId", SearchOperation.equals, String.valueOf(modelID), null));
-		TableDataDTO<ReportJobDTO> tableDataDTO= this.datatableService.getTableDataDTO(tableParameterDTO, ReportJobDTO.class);
+	public TableDataDTO<ReportJobDTO> getJobs(TableParameterDTO tableParameterDTO, Long modelID) {
+
+		tableParameterDTO.getTableFilters()
+				.add(new TableFilter("modelId", SearchOperation.equals, String.valueOf(modelID), null));
+		TableDataDTO<ReportJobDTO> tableDataDTO = this.datatableService.getTableDataDTO(tableParameterDTO,
+				ReportJobDTO.class);
 		tableDataDTO.getNames().put("fileName", resourceBundleService.getText("fileNameStartWith", null));
 		return tableDataDTO;
+	}
+
+	@Override
+	public TableDataDTO<ModelProcedureDTO> getProceduresTable(TableParameterDTO tableParameterDTO, Long modelId) {
+		tableParameterDTO.getTableFilters()
+				.add(new TableFilter("modelId", SearchOperation.equals, String.valueOf(modelId), null));
+		return this.datatableService.getTableDataDTO(tableParameterDTO, ModelProcedureDTO.class);
+	}
+
+	@Override
+	public List<ComboboxDTO> getProcedures() {
+		FindProcedures findProcedures = new FindProcedures();
+		return this.datatableService.executeMethodWithReturn(findProcedures);
+	}
+
+	@Override
+	public ModelProcedureDTO getUpdateProcedure(ModelProcedureDTO modelProcedureDTO) {
+		ModelProcedure modelProcedure = modelProcedureDTO.getId() == 0 ? new ModelProcedure()
+				: this.datatableService.findByExistingId(modelProcedureDTO.getId(), ModelProcedure.class);
+		
+		new ModelMapper().map(modelProcedureDTO, modelProcedure);
+		modelProcedure=this.datatableService.save(modelProcedure);
+		return new ModelMapper().map(modelProcedure, ModelProcedureDTO.class);
+	}
+
+	@Override
+	public void getProcedureDelete(Long id) {
+		ModelProcedure modelProcedure = this.datatableService.findByExistingId(id,ModelProcedure.class);
+		this.datatableService.delete(modelProcedure);
+		
 	}
 
 }

@@ -6,6 +6,7 @@ import rs.irm.administration.dto.CheckParentDTO;
 import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.dto.ModelJasperReportDTO;
+import rs.irm.administration.dto.ModelProcedureDTO;
 import rs.irm.administration.dto.ModelTriggerDTO;
 import rs.irm.administration.dto.NextRowColumnDTO;
 import rs.irm.administration.dto.ReportJobDTO;
@@ -60,4 +61,12 @@ public interface ModelService {
 	List<ComboboxDTO> getAllJsonFunctions();
 	
 	TableDataDTO<ReportJobDTO> getJobs(TableParameterDTO tableParameterDTO,Long modelID);
+	
+	TableDataDTO<ModelProcedureDTO> getProceduresTable(TableParameterDTO tableParameterDTO,Long modelId);
+	
+	List<ComboboxDTO> getProcedures();
+	
+	ModelProcedureDTO getUpdateProcedure(ModelProcedureDTO modelProcedureDTO);
+	
+	void getProcedureDelete(Long id);
 }
