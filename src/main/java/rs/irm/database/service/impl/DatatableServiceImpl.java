@@ -91,6 +91,20 @@ public class DatatableServiceImpl implements DatatableService {
 					statement.close();
 
 					connection = connectionIn;
+					
+					statement =connection.createStatement();
+					statement.executeUpdate("reset my.appuser");
+					statement.close();
+					
+					if(commonService !=null) {
+						if(commonService.getAppUser()!=null) {
+							if(commonService.getAppUser().getId()!=null) {
+								statement =connection.createStatement();
+								statement.executeUpdate("set my.appuser = "+commonService.getAppUser().getId());
+								statement.close();
+							}
+						}
+					}
 					AppConnections.freeConnections.remove(connectionIn);
 					break;
 				} catch (Exception e) {
