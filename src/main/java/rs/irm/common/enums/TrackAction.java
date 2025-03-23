@@ -6,6 +6,7 @@ public enum TrackAction {
 	UPDATE,
 	DELETE,
 	LOCK,
-	UNLOCK;
+	UNLOCK,
+	EXECUTE;
 
 }

@@ -235,4 +235,21 @@ public class PreviewModelController {
 		return Response.ok(previewModelService.getCodebookDisabled(value, modelId)).build();
 		
 	}
+	
+	
+	@GET
+	@Path("/procedure/{procedureid}/{modelid}/{id}")
+	@SecurityRequirement(name = "JWT")
+	@ApiResponse(responseCode = "204", description = "No content")
+	public Response getProcedureExecute(
+			@PathParam("procedureid") Long procedureId,
+			@PathParam("modelid") Long modelId,
+			@PathParam("id") Long id
+			) {
+
+		this.previewModelService.getProcedureExecute(procedureId, modelId, id);
+		return Response.noContent().build();
+		
+	}
+
 }

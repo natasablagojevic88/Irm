@@ -29,7 +29,6 @@ import rs.irm.administration.entity.AppUser;
 import rs.irm.common.dto.ComboboxDTO;
 import rs.irm.common.dto.LoginDTO;
 import rs.irm.common.dto.PublicKeyDTO;
-import rs.irm.common.dto.TokenDTO;
 import rs.irm.common.enums.Language;
 import rs.irm.common.exceptions.CommonException;
 import rs.irm.common.exceptions.FieldRequiredException;
@@ -63,7 +62,7 @@ public class LoginServiceImpl implements LoginService {
 
 	@SuppressWarnings("static-access")
 	@Override
-	public TokenDTO login(LoginDTO loginDTO) {
+	public void login(LoginDTO loginDTO) {
 
 		if (!(commonService.hasText(loginDTO.getPassword()) || commonService.hasText(loginDTO.getEncyptPassword()))) {
 			throw new FieldRequiredException("LoginDTO.password");
@@ -143,8 +142,6 @@ public class LoginServiceImpl implements LoginService {
 			servletRequest.getSession(false).removeAttribute("privateKey");
 			servletRequest.getSession(false).removeAttribute("publicKey");
 		}
-
-		return new TokenDTO(token);
 	}
 
 	@Override

@@ -52,4 +52,6 @@ public interface PreviewModelService {
 			String jsonFunction);
 	
 	LinkedHashMap<String,List<ComboboxDTO>> getCodebookDisabled(LinkedHashMap<String,Object> value,Long modelId);
+	
+	void getProcedureExecute(Long procedureId,Long modelId, Long id);
 }

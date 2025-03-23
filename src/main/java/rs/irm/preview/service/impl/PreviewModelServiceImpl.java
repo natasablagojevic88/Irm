@@ -68,6 +68,7 @@ import rs.irm.preview.utils.CreateListCombobox;
 import rs.irm.preview.utils.CreateSubCodebook;
 import rs.irm.preview.utils.DeleteItem;
 import rs.irm.preview.utils.ExcelImport;
+import rs.irm.preview.utils.ExecuteProcedure;
 import rs.irm.preview.utils.LockItem;
 import rs.irm.preview.utils.PreviewItem;
 import rs.irm.preview.utils.PreviewTableCreate;
@@ -670,6 +671,14 @@ public class PreviewModelServiceImpl implements PreviewModelService {
 		CheckDisabledCodebook checkDisabledCodebook = new CheckDisabledCodebook(value, columnDTOs);
 
 		return this.datatableService.executeMethodWithReturn(checkDisabledCodebook);
+	}
+
+	@Override
+	public void getProcedureExecute(Long procedureId, Long modelId, Long id) {
+		checkRole(CheckRole.UPDATE, modelId);
+		
+		ExecuteProcedure executeProcedure=new ExecuteProcedure(procedureId, modelId, id, httpServletRequest);
+		this.datatableService.executeMethod(executeProcedure);
 	}
 
 }

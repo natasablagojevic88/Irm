@@ -9,6 +9,7 @@ import rs.irm.administration.dto.DashboardRoleInfoDTO;
 import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.dto.ModelJasperReportDTO;
+import rs.irm.administration.dto.ModelProcedureDTO;
 import rs.irm.administration.dto.ReportDTO;
 import rs.irm.administration.dto.ReportGroupDTO;
 import rs.irm.administration.dto.ReportGroupRolesDTO;
@@ -27,4 +28,5 @@ public class ModelData {
 	public static List<DashboardRoleInfoDTO> dashboardRoleDtos=new ArrayList<>();
 	public static List<ReportJobDTO> listReportJobDTOs=new ArrayList<>();
 	public static LinkedHashMap<Long, ReportJobSessionDTO> reportJobStates=new LinkedHashMap<>();
+	public static List<ModelProcedureDTO> modelProcedureDTOs=new ArrayList<>();
 }

@@ -18,7 +18,6 @@ import jakarta.ws.rs.core.Response;
 import rs.irm.common.dto.ComboboxDTO;
 import rs.irm.common.dto.LoginDTO;
 import rs.irm.common.dto.PublicKeyDTO;
-import rs.irm.common.dto.TokenDTO;
 import rs.irm.common.service.LoginService;
 
 @Path("/login")
@@ -27,13 +26,14 @@ public class LoginController {
 	@Inject
 	private LoginService loginService;
 
-	@ApiResponse(responseCode = "200", description = "Response",content = @Content(schema = @Schema(implementation = TokenDTO.class)))
+	@ApiResponse(responseCode = "204", description = "No content")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@SecurityRequirement(name="JWT")
 	public Response login(@Valid LoginDTO loginDTO) {
-		return Response.ok(loginService.login(loginDTO)).build();
+		this.loginService.login(loginDTO);
+		return Response.noContent().build();
 	}
 	
 	@ApiResponse(responseCode = "200", description = "Response",content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))

@@ -42,6 +42,7 @@ import rs.irm.administration.utils.DeleteTrigger;
 import rs.irm.administration.utils.FindColumns;
 import rs.irm.administration.utils.FindFunctions;
 import rs.irm.administration.utils.FindProcedures;
+import rs.irm.administration.utils.ModelData;
 import rs.irm.administration.utils.ModelJasperReportDelete;
 import rs.irm.administration.utils.ModelJasperReportUpdate;
 import rs.irm.administration.utils.RefreshModel;
@@ -403,6 +404,7 @@ public class ModelServiceImpl implements ModelService {
 		
 		new ModelMapper().map(modelProcedureDTO, modelProcedure);
 		modelProcedure=this.datatableService.save(modelProcedure);
+		ModelData.modelProcedureDTOs=this.datatableService.findAll(new TableParameterDTO(), ModelProcedureDTO.class);
 		return new ModelMapper().map(modelProcedure, ModelProcedureDTO.class);
 	}
 
@@ -410,7 +412,7 @@ public class ModelServiceImpl implements ModelService {
 	public void getProcedureDelete(Long id) {
 		ModelProcedure modelProcedure = this.datatableService.findByExistingId(id,ModelProcedure.class);
 		this.datatableService.delete(modelProcedure);
-		
+		ModelData.modelProcedureDTOs=this.datatableService.findAll(new TableParameterDTO(), ModelProcedureDTO.class);
 	}
 
 }

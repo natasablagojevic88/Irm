@@ -29,6 +29,7 @@ import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.dto.ModelJasperReportDTO;
+import rs.irm.administration.dto.ModelProcedureDTO;
 import rs.irm.administration.enums.ModelColumnType;
 import rs.irm.administration.enums.ModelType;
 import rs.irm.administration.utils.ModelData;
@@ -620,9 +621,11 @@ public class ModelQueryCreatorServiceImpl implements ModelQueryCreatorService {
 
 	private List<TableButton> getSubmodelsTable(Long modelId) {
 		List<TableButton> tableButtons = new ArrayList<>();
+		
+		ModelDTO model=findModel(modelId);
 
 		List<ModelDTO> submodels = ModelData.listModelDTOs.stream().filter(a -> a.getParentId() != null)
-				.filter(a -> a.getParentId() == modelId).filter(a -> a.getType().equals(ModelType.TABLE.name()))
+				.filter(a -> a.getParentId().doubleValue() == modelId.doubleValue()).filter(a -> a.getType().equals(ModelType.TABLE.name()))
 				.sorted(Comparator.comparing(ModelDTO::getName)).toList();
 
 		for (ModelDTO modelDTO : submodels) {
@@ -640,7 +643,7 @@ public class ModelQueryCreatorServiceImpl implements ModelQueryCreatorService {
 		}
 
 		List<ModelJasperReportDTO> jaspers = ModelData.listModelJasperReportDTOs.stream()
-				.filter(a -> a.getModelId() == modelId).sorted(Comparator.comparing(ModelJasperReportDTO::getName))
+				.filter(a -> a.getModelId().doubleValue() == modelId.doubleValue()).sorted(Comparator.comparing(ModelJasperReportDTO::getName))
 				.toList();
 
 		for (ModelJasperReportDTO jasperReportDTO : jaspers) {
@@ -650,6 +653,23 @@ public class ModelQueryCreatorServiceImpl implements ModelQueryCreatorService {
 			tableButton.setIcon("fa fa-file-pdf-o");
 			tableButton.setName(resourceBundleService.getText(jasperReportDTO.getName(), null));
 			tableButtons.add(tableButton);
+		}
+		
+		List<ModelProcedureDTO> procedureDTOs=ModelData.modelProcedureDTOs.stream()
+				.filter(a->a.getModelId().doubleValue()==modelId.doubleValue())
+				.sorted(Comparator.comparing(ModelProcedureDTO::getName))
+				.toList();
+		
+		for(ModelProcedureDTO modelProcedureDTO:procedureDTOs) {
+			TableButton tableButton = new TableButton();
+			tableButton.setCode("/procedure/" + modelProcedureDTO.getId());
+			tableButton.setColor("Fuchsia");
+			tableButton.setIcon("fa fa-code");
+			tableButton.setName(resourceBundleService.getText(modelProcedureDTO.getName(), null));
+			if (commonService.getRoles().contains(CheckAdmin.roleAdmin)
+					|| commonService.getRoles().contains(model.getUpdateRoleCode())) {
+				tableButtons.add(tableButton);
+			}
 		}
 
 		return tableButtons;

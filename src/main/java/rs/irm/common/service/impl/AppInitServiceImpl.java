@@ -45,6 +45,7 @@ import rs.irm.administration.dto.DashboardRoleInfoDTO;
 import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.dto.ModelJasperReportDTO;
+import rs.irm.administration.dto.ModelProcedureDTO;
 import rs.irm.administration.dto.ReportDTO;
 import rs.irm.administration.dto.ReportGroupDTO;
 import rs.irm.administration.dto.ReportGroupRolesDTO;
@@ -336,6 +337,7 @@ public class AppInitServiceImpl implements AppInitService {
 				DashboardRoleInfoDTO.class);
 		ModelData.listReportJobDTOs = this.datatableService.findAll(new TableParameterDTO(), ReportJobDTO.class);
 		ModelData.reportJobStates = new LinkedHashMap<>();
+		ModelData.modelProcedureDTOs=this.datatableService.findAll(new TableParameterDTO(), ModelProcedureDTO.class);
 
 	}
 
