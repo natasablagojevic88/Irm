@@ -18,6 +18,7 @@ public class CustomServletContextListener implements ServletContextListener {
 	private AppInitService appInitService = new AppInitServiceImpl();
 
 	@Override
+	//izmena
 	public void contextInitialized(ServletContextEvent sce) {
 		appInitService.initParameters();
 		appInitService.initConnections();
