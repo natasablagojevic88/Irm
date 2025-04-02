@@ -31,6 +31,8 @@ import rs.irm.database.dto.TableParameterDTO;
 public class AppUserController {
 
 	@Inject
+	
+	//Test1
 	private AppUserService appUserService;
 
 	@POST
