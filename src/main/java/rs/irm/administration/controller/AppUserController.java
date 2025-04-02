@@ -32,7 +32,7 @@ public class AppUserController {
 
 	@Inject
 	
-	//Test3
+	//Test4
 	private AppUserService appUserService;
 
 	@POST
