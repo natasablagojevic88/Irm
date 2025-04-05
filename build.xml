@@ -80,7 +80,7 @@
 	</target>
 
 	<target name="war" depends="copy-browser">
-		<war destfile="${war.file}" webxml="${webinf.dir}/web.xml">
+		<war destfile="${war.file}">
 			<fileset dir="${dist.dir}" />
 		</war>
 	</target>
