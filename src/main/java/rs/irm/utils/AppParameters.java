@@ -14,5 +14,6 @@ public class AppParameters {
 	public static String jobdateformat;
 	public static String jobdatetimeformat;
 	public static Boolean production;
+	public static String remoteaddrheader;
 
 }

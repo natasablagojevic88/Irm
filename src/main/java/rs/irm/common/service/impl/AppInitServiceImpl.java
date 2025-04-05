@@ -1,9 +1,15 @@
 package rs.irm.common.service.impl;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -40,6 +46,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.dto.DashboardDTO;
 import rs.irm.administration.dto.DashboardRoleInfoDTO;
 import rs.irm.administration.dto.ModelColumnDTO;
@@ -50,6 +57,8 @@ import rs.irm.administration.dto.ReportDTO;
 import rs.irm.administration.dto.ReportGroupDTO;
 import rs.irm.administration.dto.ReportGroupRolesDTO;
 import rs.irm.administration.dto.ReportJobDTO;
+import rs.irm.administration.entity.ModelJasperReport;
+import rs.irm.administration.entity.ReportJasper;
 import rs.irm.administration.entity.ReportJob;
 import rs.irm.administration.service.LoadReportJobService;
 import rs.irm.administration.service.impl.LoadReportJobServiceImpl;
@@ -337,7 +346,7 @@ public class AppInitServiceImpl implements AppInitService {
 				DashboardRoleInfoDTO.class);
 		ModelData.listReportJobDTOs = this.datatableService.findAll(new TableParameterDTO(), ReportJobDTO.class);
 		ModelData.reportJobStates = new LinkedHashMap<>();
-		ModelData.modelProcedureDTOs=this.datatableService.findAll(new TableParameterDTO(), ModelProcedureDTO.class);
+		ModelData.modelProcedureDTOs = this.datatableService.findAll(new TableParameterDTO(), ModelProcedureDTO.class);
 
 	}
 
@@ -378,6 +387,60 @@ public class AppInitServiceImpl implements AppInitService {
 			logger.error(e.getMessage(), e);
 		}
 
+	}
+
+	@Override
+	public void initJasperReports() {
+
+		File jasperModelFolder = new File(AppParameters.jasperfilepath);
+
+		if (!(jasperModelFolder.exists() && jasperModelFolder.isDirectory())) {
+			jasperModelFolder.mkdirs();
+		}
+
+		List<ModelJasperReport> modelJasperReports = this.datatableService.findAll(new TableParameterDTO(),
+				ModelJasperReport.class);
+		for (ModelJasperReport modelJasperReport : modelJasperReports) {
+			File jasperFile = new File(
+					jasperModelFolder.getAbsolutePath() + "/" + modelJasperReport.getJasperFileName());
+
+			if (jasperFile.exists() && jasperFile.isFile()) {
+				continue;
+			}
+
+			try {
+				Files.copy(new ByteArrayInputStream(modelJasperReport.getBytes()),
+						Paths.get(jasperFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+				throw new WebApplicationException(e);
+			}
+		}
+		
+		File jasperReportFolder = new File(AppParameters.jasperreportpath);
+
+		if (!(jasperReportFolder.exists() && jasperReportFolder.isDirectory())) {
+			jasperReportFolder.mkdirs();
+		}
+
+		List<ReportJasper> reportJaspers=this.datatableService.findAll(new TableParameterDTO(), ReportJasper.class);
+		
+		for(ReportJasper reportJasper:reportJaspers) {
+			File jasperFile = new File(
+					jasperReportFolder.getAbsolutePath() + "/" + reportJasper.getName());
+
+			if (jasperFile.exists() && jasperFile.isFile()) {
+				continue;
+			}
+
+			try {
+				Files.copy(new ByteArrayInputStream(reportJasper.getBytes()),
+						Paths.get(jasperFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+				throw new WebApplicationException(e);
+			}
+		}
 	}
 
 }

@@ -19,4 +19,6 @@ public interface AppInitService {
 	void checkAdmin();
 	
 	void initQuart();
+	
+	void initJasperReports();
 }

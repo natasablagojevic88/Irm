@@ -27,6 +27,7 @@ public class CustomServletContextListener implements ServletContextListener {
 		appInitService.loadModel();
 		appInitService.checkAdmin();
 		appInitService.initQuart();
+		appInitService.initJasperReports();
 	}
 
 	@Override

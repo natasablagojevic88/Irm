@@ -22,6 +22,7 @@ import rs.irm.common.dto.ComboboxDTO;
 import rs.irm.common.exceptions.CommonException;
 import rs.irm.common.service.CommonService;
 import rs.irm.common.service.ResourceBundleService;
+import rs.irm.utils.AppParameters;
 
 @Named
 public class CommonServiceImpl implements CommonService {
@@ -61,8 +62,8 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public String getIpAddress() {
 		if (httpServletRequest != null) {
-			if(hasText(httpServletRequest.getHeader("X-Real-IP"))) {
-				return httpServletRequest.getHeader("X-Real-IP");
+			if(hasText(httpServletRequest.getHeader(AppParameters.remoteaddrheader))) {
+				return httpServletRequest.getHeader(AppParameters.remoteaddrheader);
 			}else {
 				return httpServletRequest.getRemoteAddr();
 			}

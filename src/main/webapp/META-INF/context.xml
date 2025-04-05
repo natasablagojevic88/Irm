@@ -44,5 +44,8 @@
 
 	<Environment name="jobdatetimeformat"
 		type="java.lang.String" value="yyyyMMddHHmmss" />
+		
+	<Environment name="remoteaddrheader"
+		type="java.lang.String" value="X-Real-IP" />
 
 </Context>
