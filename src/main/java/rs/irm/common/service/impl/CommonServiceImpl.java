@@ -61,7 +61,12 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public String getIpAddress() {
 		if (httpServletRequest != null) {
-			return httpServletRequest.getRemoteAddr();
+			if(hasText(httpServletRequest.getHeader("X-Real-IP"))) {
+				httpServletRequest.getHeader("X-Real-IP");
+			}else {
+				return httpServletRequest.getRemoteAddr();
+			}
+			
 		}
 		return null;
 	}
