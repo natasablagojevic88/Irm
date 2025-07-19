@@ -7,11 +7,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
-import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.security.SecurityScheme.Type;
 import io.swagger.v3.oas.models.servers.Server;
 import jakarta.ws.rs.ApplicationPath;
 import rs.irm.utils.AppParameters;
@@ -54,16 +51,6 @@ public class Irm extends ResourceConfig {
 				add(server);
 			}
 		});
-
-		SecurityScheme securityScheme = new SecurityScheme();
-		securityScheme.setName("JWT");
-		securityScheme.setBearerFormat("JWT");
-		securityScheme.setScheme("bearer");
-		securityScheme.setType(Type.HTTP);
-
-		Components components = new Components();
-		components.addSecuritySchemes("JWT", securityScheme);
-		openAPI.setComponents(components);
 
 		configuration.setOpenAPI(openAPI);
 		configuration.setResourcePackages(new HashSet<String>() {

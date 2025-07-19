@@ -22,7 +22,6 @@ public class CustomServletContextListener implements ServletContextListener {
 		appInitService.initParameters();
 		appInitService.initConnections();
 		appInitService.createTables();
-		appInitService.generateKeys();
 		appInitService.loadIcons();
 		appInitService.loadModel();
 		appInitService.checkAdmin();

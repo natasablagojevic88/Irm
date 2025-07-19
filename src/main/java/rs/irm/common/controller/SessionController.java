@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,7 +37,6 @@ public class SessionController {
 
 	@GET
 	@ApiResponse(responseCode = "204",description = "No response")
-	@SecurityRequirement(name="JWT")
 	public Response checkSession() {
 		return Response.noContent().build();
 	}
@@ -47,7 +45,6 @@ public class SessionController {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	@ApiResponse(responseCode = "200",description = "No response",content = @Content(schema = @Schema(implementation = String.class)))
-	@SecurityRequirement(name="JWT")
 	public Response getResource(@PathParam("text") String text) {
 		return Response.ok(resourceBundleService.getText(text, null)).build();
 	}
@@ -57,7 +54,6 @@ public class SessionController {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200",description = "No response",content = @Content(array = @ArraySchema(schema=@Schema(implementation = ComboboxDTO.class))))
-	@SecurityRequirement(name="JWT")
 	public Response getEnumBox(@PathParam("classpath") String classpath) {
 		
 		try {
@@ -73,7 +69,6 @@ public class SessionController {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200",description = "No response",content = @Content(array = @ArraySchema(schema=@Schema(implementation = LinkedHashMap.class))))
-	@SecurityRequirement(name="JWT")
 	public Response getNames(@PathParam("classpath") String classpath) {
 		
 		try {

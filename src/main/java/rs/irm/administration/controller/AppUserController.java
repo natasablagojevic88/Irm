@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -36,7 +35,6 @@ public class AppUserController {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	@RolesAllowed(value = { "admin" })
 	@Path("/table")
@@ -47,7 +45,6 @@ public class AppUserController {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = AppUserDTO.class)))
 	@RolesAllowed(value = { "admin" })
 	public Response getUpdate(@Valid AppUserDTO appUserDTO) {
@@ -55,7 +52,6 @@ public class AppUserController {
 	}
 
 	@DELETE
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "204", description = "No response")
 	@RolesAllowed(value = { "admin" })
 	@Path("/{id}")
@@ -66,7 +62,6 @@ public class AppUserController {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AppUserRoleDTO.class))))
 	@RolesAllowed(value = { "admin" })
 	@Path("/roles/{userid}")
@@ -76,7 +71,6 @@ public class AppUserController {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "204", description = "No content")
 	@RolesAllowed(value = { "admin" })
 	@Path("/roles/{userid}")
@@ -87,7 +81,6 @@ public class AppUserController {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "204", description = "No content")
 	@Path("/changepassword")
 	public Response getChangePassword(
@@ -98,7 +91,6 @@ public class AppUserController {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response",content = @Content(schema = @Schema(implementation = AppUserInfoDTO.class)))
 	@Path("/userinfo")
 	public Response getUserInfo() {

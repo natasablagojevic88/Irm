@@ -58,6 +58,17 @@ public class CommonServiceImpl implements CommonService {
 		}
 		return null;
 	}
+	
+
+	@Override
+	public String getSession() {
+		if (httpServletRequest != null) {
+			String session = (String) httpServletRequest.getAttribute("session");
+
+			return session;
+		}
+		return null;
+	}
 
 	@Override
 	public String getIpAddress() {
@@ -150,5 +161,6 @@ public class CommonServiceImpl implements CommonService {
 		}
 		
 	}
+
 
 }

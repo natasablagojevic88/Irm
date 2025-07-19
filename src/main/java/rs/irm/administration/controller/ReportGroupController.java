@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -35,7 +34,6 @@ public class ReportGroupController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/table")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	@RolesAllowed(value = { "admin" })
 	public Response getTable(
@@ -47,7 +45,6 @@ public class ReportGroupController {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = ReportGroupDTO.class)))
 	@RolesAllowed(value = { "admin" })
 	public Response getUpdate(
@@ -58,7 +55,6 @@ public class ReportGroupController {
 	
 	@DELETE
 	@Path("/{id}")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "204",description = "No content")
 	@RolesAllowed(value = { "admin" })
 	public Response getDelete(
@@ -71,7 +67,6 @@ public class ReportGroupController {
 	@GET
 	@Path("/roles/{reportgroupid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReportGroupRoleDTO.class))))
 	@RolesAllowed(value = { "admin" })
 	public Response getRoles(
@@ -84,7 +79,6 @@ public class ReportGroupController {
 	@Path("/roles/{reportgroupid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "204",description = "No content")
 	@RolesAllowed(value = { "admin" })
 	public Response getRolesUpdate(

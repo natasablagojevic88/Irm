@@ -3,7 +3,6 @@ package rs.irm.preview.controller;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -25,7 +24,6 @@ public class PreviewDashboardController {
 	@Path("/{id}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = DashboardResultDTO.class)))
 	public Response getDashboardData(
 			@PathParam("id") Long id
@@ -36,7 +34,6 @@ public class PreviewDashboardController {
 	
 	@GET
 	@Path("/setdefault/{dashboardid}")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "204",description = "No content")
 	public Response setDefaultDashboard(
 			@PathParam("dashboardid") Long dashboardid
@@ -47,7 +44,6 @@ public class PreviewDashboardController {
 	
 	@GET
 	@Path("/removedefault/{dashboardid}")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "204",description = "No content")
 	public Response setRemoveDashboard(
 			@PathParam("dashboardid") Long dashboardid

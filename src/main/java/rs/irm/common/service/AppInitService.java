@@ -10,8 +10,6 @@ public interface AppInitService {
 	
 	void createTables();
 	
-	void generateKeys();
-	
 	void loadIcons();
 	
 	void loadModel();

@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -46,7 +45,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ModelDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getTree() {
 		return Response.ok(modelService.getTree()).build();
 	}
@@ -56,7 +54,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getIcons() {
 		return Response.ok(AppInitServiceImpl.icons).build();
 	}
@@ -66,7 +63,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getRoles() {
 		return Response.ok(modelService.getRoles()).build();
 	}
@@ -76,7 +72,6 @@ public class ModelController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ModelDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getUpdate(@Valid ModelDTO modelDTO) {
 		return Response.ok(modelService.getUpdate(modelDTO)).build();
 	}
@@ -85,7 +80,6 @@ public class ModelController {
 	@Path("/{id}")
 	@ApiResponse(responseCode = "204", description = "No content")
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getDelete(@PathParam("id") Long id) {
 		modelService.getDelete(id);
 		return Response.noContent().build();
@@ -97,7 +91,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getColumnTable(TableParameterDTO tableParameterDTO, @PathParam("modelid") Long modelId) {
 		return Response.ok(modelService.getColumns(tableParameterDTO, modelId)).build();
 	}
@@ -107,7 +100,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getCodebookList() {
 		return Response.ok(modelService.getCodebookList()).build();
 	}
@@ -118,7 +110,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getCodebookTable(TableParameterDTO tableParameterDTO) {
 		return Response.ok(modelService.getCodebookTable(tableParameterDTO)).build();
 	}
@@ -128,7 +119,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = NextRowColumnDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getNextRowColumn(@PathParam("modelid") Long modelId) {
 		return Response.ok(modelService.getNextRowColumn(modelId)).build();
 	}
@@ -138,7 +128,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = CheckParentDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getCheckParent(
 			@PathParam("columnid") Long columnId, 
 			@PathParam("modelid") Long modelId, 
@@ -152,7 +141,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ModelColumnDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getColumnUpdate(@Valid ModelColumnDTO modelColumnDTO) {
 		return Response.ok(modelService.getUpdateColumn(modelColumnDTO)).build();
 	}
@@ -161,7 +149,6 @@ public class ModelController {
 	@Path("/column/{id}")
 	@ApiResponse(responseCode = "204", description = "No content")
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getColumnDelete(@PathParam("id") Long id) {
 		modelService.getColumnDelete(id);
 		return Response.noContent().build();
@@ -173,7 +160,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getTriggerTable(
 			TableParameterDTO tableParameterDTO, 
 			@PathParam("modelid") Long modelId
@@ -187,7 +173,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ModelTriggerDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getTriggerUpdate(
 			@Valid ModelTriggerDTO modelTriggerDTO
 		) {
@@ -199,7 +184,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getAllColumnsForModel(
 			@PathParam("modelid") Long modelId
 		) {
@@ -211,7 +195,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getAllTriggerFunctions(
 		) {
 		return Response.ok(modelService.getAllTriggerFunctions()).build();
@@ -221,7 +204,6 @@ public class ModelController {
 	@Path("/trigger/{id}")
 	@ApiResponse(responseCode = "204", description = "No content")
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getTriggerDelete(
 			@PathParam("id") Long id
 		) {
@@ -233,7 +215,6 @@ public class ModelController {
 	@Path("/refresh")
 	@ApiResponse(responseCode = "204", description = "No content")
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getRefreshModel(
 		) {
 		this.modelService.refreshModel();
@@ -246,7 +227,6 @@ public class ModelController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response",content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getJasperListTable(
 			TableParameterDTO tableParameterDTO,
 			@PathParam("modelid") Long modelId
@@ -261,7 +241,6 @@ public class ModelController {
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	@ApiResponse(responseCode = "200", description = "Response",content = @Content(schema = @Schema(implementation = FileUploadPathDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getUploadFile(
 			File file
 		) {
@@ -275,7 +254,6 @@ public class ModelController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response",content = @Content(schema = @Schema(implementation = ModelJasperReportDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getJasperUpdate(
 			ModelJasperReportDTO modelJasperReportDTO,
 			@PathParam("modelid") Long modelId
@@ -288,7 +266,6 @@ public class ModelController {
 	@Path("/jasper/{id}")
 	@ApiResponse(responseCode = "204", description = "No content")
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getJasperDelete(
 			@PathParam("id") Long id
 		) {
@@ -300,7 +277,6 @@ public class ModelController {
 	@Path("/refreshjasperfiles")
 	@ApiResponse(responseCode = "204", description = "No content")
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getRefreshJasperFiles(
 		) {
 		this.modelService.refreshJasperFiles();
@@ -312,7 +288,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getAllJsonFunctions(
 		) {
 		return Response.ok(modelService.getAllJsonFunctions()).build();
@@ -323,7 +298,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getJobList(
 			TableParameterDTO tableParameterDTO,
 			@PathParam("modelid") Long modelID
@@ -337,7 +311,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getProcedureTable(
 			TableParameterDTO tableParameterDTO, 
 			@PathParam("modelid") Long modelId
@@ -350,7 +323,6 @@ public class ModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getProcedures(
 		) {
 		return Response.ok(modelService.getProcedures()).build();
@@ -362,7 +334,6 @@ public class ModelController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ComboboxDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getProcedureUpdate(
 			@Valid ModelProcedureDTO modelProcedureDTO
 		) {
@@ -373,7 +344,6 @@ public class ModelController {
 	@Path("/procedure/delete/{id}")
 	@ApiResponse(responseCode = "204", description = "No content")
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getProcedureDelete(
 			@PathParam("id") Long id
 		) {

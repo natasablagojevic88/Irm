@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -35,7 +34,6 @@ public class SqlExecutorController {
 	@GET
 	@Path("/tables")
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SqlEditorInfo.class))))
 	public Response getTablesAndColumns() {
@@ -46,7 +44,6 @@ public class SqlExecutorController {
 	@Path("/sqlquery")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = SqlResultDTO.class)))
 	public Response getSqlQuery(@Valid SqlQueryParametersDTO sqlQueryParametersDTO) {
@@ -58,7 +55,6 @@ public class SqlExecutorController {
 	@Path("/excel")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ByteArrayOutputStream.class)))
 	public Response getExcel(@Valid SqlQueryParametersDTO sqlQueryParametersDTO) {
@@ -70,7 +66,6 @@ public class SqlExecutorController {
 	@Path("/excel/base64")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = Base64DownloadFileDTO.class)))
 	public Response getExcelBase64(@Valid SqlQueryParametersDTO sqlQueryParametersDTO) {
@@ -82,7 +77,6 @@ public class SqlExecutorController {
 	@Path("/execute")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = SqlExecuteResultDTO.class)))

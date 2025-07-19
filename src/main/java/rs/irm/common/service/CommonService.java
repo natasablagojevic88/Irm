@@ -16,6 +16,8 @@ public interface CommonService {
 	
 	String getIpAddress();
 	
+	String getSession();
+	
 	List<String> getRoles();
 	
 	List<ComboboxDTO> enumToCombobox(Class<? extends Enum<?>> inEnumClass);

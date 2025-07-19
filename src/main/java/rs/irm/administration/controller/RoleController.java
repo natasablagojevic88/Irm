@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -37,7 +36,6 @@ public class RoleController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getTable(TableParameterDTO tableParameterDTO) {
 
 		return Response.ok(roleService.getTable(tableParameterDTO)).build();
@@ -48,7 +46,6 @@ public class RoleController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = RoleDTO.class)))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getUpdate(@Valid RoleDTO roleDTO) {
 
 		return Response.ok(roleService.getUpdate(roleDTO)).build();
@@ -58,7 +55,6 @@ public class RoleController {
 	@Path("/{id}")
 	@ApiResponse(responseCode = "204", description = "No response")
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getDelete(@PathParam("id") Long id) {
 
 		roleService.getDelete(id);
@@ -70,7 +66,6 @@ public class RoleController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RoleAppUserDTO.class))))
 	@RolesAllowed("admin")
-	@SecurityRequirement(name = "JWT")
 	public Response getUsers(@PathParam("roleid") Long roleId) {
 
 		return Response.ok(roleService.getUsersForRole(roleId)).build();

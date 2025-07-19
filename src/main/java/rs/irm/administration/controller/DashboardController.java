@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -40,7 +39,6 @@ public class DashboardController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed("admin")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	public Response getTable(
 			TableParameterDTO tableParameterDTO
@@ -52,7 +50,6 @@ public class DashboardController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed("admin")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = DashboardDTO.class)))
 	public Response getUpdate(
 			@Valid DashboardDTO dashboardDTO
@@ -63,7 +60,6 @@ public class DashboardController {
 	@DELETE
 	@Path("/{id}")
 	@RolesAllowed("admin")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "204",description = "No content")
 	public Response getDelete(
 			@PathParam("id") Long id
@@ -76,7 +72,6 @@ public class DashboardController {
 	@Path("/roles/{dashboardid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed("admin")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(array = @ArraySchema(schema = @Schema(implementation = DashboardRoleDTO.class))))
 	public Response getRoles(
 			@PathParam("dashboardid") Long dashboardId
@@ -88,7 +83,6 @@ public class DashboardController {
 	@Path("/roles/{dashboardid}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed("admin")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "204",description = "No content")
 	public Response changeRoleToDashboard(
 			@Valid DashboardRoleDTO dashboardRoleDTO,
@@ -102,7 +96,6 @@ public class DashboardController {
 	@Path("/reports/combobox")
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed("admin")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))
 	public Response getReportsCombobox(
 			) {
@@ -115,7 +108,6 @@ public class DashboardController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed("admin")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	public Response getReportsTable(
 			TableParameterDTO tableParameterDTO
@@ -128,7 +120,6 @@ public class DashboardController {
 	@Path("/reports/{dashboardid}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed("admin")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "204",description = "No content")
 	public Response getUpdateReports(
 			List<DashboardItemDTO> dashboardItemDTOs,
@@ -142,7 +133,6 @@ public class DashboardController {
 	@Path("/reports/{dashboardid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed("admin")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(array = @ArraySchema(schema = @Schema(implementation = DashboardItemDTO.class))))
 	public Response getReportList(
 			@PathParam("dashboardid") Long dashboardid

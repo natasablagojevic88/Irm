@@ -19,16 +19,15 @@
 	<Environment name="checkconnection" type="java.lang.String"
 		value="select 1" />
 
-	<Environment name="sessionduration" type="java.lang.Long"
-		value="604800000" />
+	<Environment name="sessionduration" type="java.lang.Integer"
+		value="1" />
+		
+	<Environment name="refreshtokenduration" type="java.lang.Integer"
+		value="15" />
 
 	<!-- srRS , srLatnRS , enUS -->
 	<Environment name="defaultlang" type="java.lang.String"
 		value="srRS" />
-
-	<!-- dev , production -->
-	<Environment name="keystoretype" type="java.lang.String"
-		value="production" />
 
 	<Environment name="jasperfilepath" type="java.lang.String"
 		value=".jasperReports" />
@@ -51,7 +50,4 @@
 	<Environment name="loadjobs"
 		type="java.lang.Boolean" value="true" />
 		
-	<Environment name="privatekeysecret"
-		type="java.lang.String" value="anc5a3dlbDh2MGJ0encwZg==" />
-
 </Context>

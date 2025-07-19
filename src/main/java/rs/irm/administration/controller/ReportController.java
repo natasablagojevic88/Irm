@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -38,7 +37,6 @@ public class ReportController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/table/{reportgroupid}")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	public Response getTable(TableParameterDTO tableParameterDTO, 
 			@PathParam("reportgroupid") Long reportGroupId)
@@ -50,7 +48,6 @@ public class ReportController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/tree/{modelid}")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReportColumnInfoDTO.class))))
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	public Response getTreeField(
 			@PathParam("modelid") Long modelId)
@@ -63,7 +60,6 @@ public class ReportController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ReportDTO.class)))
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	public Response getUpdate(
 			@Valid ReportDTO reportDTO
@@ -75,7 +71,6 @@ public class ReportController {
 	@Path("/info/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ReportDTO.class)))
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	public Response getInfo(
 			@PathParam("id") Long id
@@ -87,7 +82,6 @@ public class ReportController {
 	@DELETE
 	@Path("/{id}")
 	@ApiResponse(responseCode = "204", description = "No content")
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	public Response getDelete(
 			@PathParam("id") Long id
@@ -99,7 +93,6 @@ public class ReportController {
 	@GET
 	@Path("/jasperrefresh")
 	@ApiResponse(responseCode = "204", description = "No content")
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	public Response getJasperFileRefresh(
 			){
@@ -112,7 +105,6 @@ public class ReportController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response",content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	public Response getJobList(
 			TableParameterDTO tableParameterDTO,
@@ -126,7 +118,6 @@ public class ReportController {
 	@Path("/jobs/smtpbox")
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response",content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	public Response getSmtpBox(
 			){
@@ -139,7 +130,6 @@ public class ReportController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response",content = @Content(schema = @Schema(implementation = ReportJobDTO.class)))
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	public Response getJobUpdate(
 			@Valid ReportJobDTO reportJobDTO
@@ -151,7 +141,6 @@ public class ReportController {
 	@DELETE
 	@Path("/report-job/{id}")
 	@ApiResponse(responseCode = "204", description = "No content")
-	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })
 	public Response getJobDelete(
 			@PathParam("id") Long id

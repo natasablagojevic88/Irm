@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -29,7 +28,6 @@ public class LoginController {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name="JWT")
 	public Response login(@Valid LoginDTO loginDTO) {
 		this.loginService.login(loginDTO);
 		return Response.noContent().build();
@@ -38,7 +36,6 @@ public class LoginController {
 	@ApiResponse(responseCode = "200", description = "Response",content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))
 	@GET
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name="JWT")
 	public Response language() {
 		return Response.ok(loginService.language()).build();
 	}
@@ -48,7 +45,6 @@ public class LoginController {
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name="JWT")
 	public Response logout() {
 		this.loginService.logout();
 		return Response.noContent().build();

@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -35,7 +34,6 @@ public class JobInfoController {
 	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed(value = { "admin" })
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	public Response getList() {
 		return Response.ok(jobInfoService.getList()).build();
@@ -44,7 +42,6 @@ public class JobInfoController {
 	@GET
 	@Path("/execute/{id}")
 	@RolesAllowed(value = { "admin" })
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "204",description = "No content")
 	public Response getExecute(
 			@PathParam("id") Long id
@@ -57,7 +54,6 @@ public class JobInfoController {
 	@Path("/download/{id}")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	@RolesAllowed(value = { "admin" })
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = ByteArrayOutputStream.class)))
 	public Response getDownload(
 			@PathParam("id") Long id
@@ -70,7 +66,6 @@ public class JobInfoController {
 	@Path("/download/{id}/base64")
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed(value = { "admin" })
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = Base64DownloadFileDTO.class)))
 	public Response getDownloadBase64(
 			@PathParam("id") Long id
@@ -83,7 +78,6 @@ public class JobInfoController {
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed(value = { "admin" })
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = JobInfoDTO.class)))
 	public Response getJobInfo(
 			@PathParam("id") Long id
@@ -96,7 +90,6 @@ public class JobInfoController {
 	@Path("/jobeditinfo/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@RolesAllowed(value = { "admin" })
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = JobEditInfoDTO.class)))
 	public Response getJobEditInfo(
 			@PathParam("id") Long id
@@ -110,7 +103,6 @@ public class JobInfoController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed(value = { "admin" })
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	public Response getLogs(
 			TableParameterDTO tableParameterDTO,

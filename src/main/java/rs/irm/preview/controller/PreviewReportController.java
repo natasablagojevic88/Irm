@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -33,7 +32,6 @@ public class PreviewReportController {
 	@GET
 	@Path("/parameters/{reportid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ReportPreviewInfoDTO.class)))
 	public Response getParameters(@PathParam("reportid") Long reportId) {
 
@@ -44,7 +42,6 @@ public class PreviewReportController {
 	@Path("/{reportid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = SqlResultDTO.class)))
 	public Response getPreviewReport(TableReportParameterDTO tableReportParameterDTO,
 			@PathParam("reportid") Long reportId) {
@@ -56,7 +53,6 @@ public class PreviewReportController {
 	@Path("/excel/{reportid}")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ByteArrayOutputStream.class)))
 	public Response getPreviewExcel(TableReportParameterDTO tableReportParameterDTO,
 			@PathParam("reportid") Long reportId) {
@@ -68,7 +64,6 @@ public class PreviewReportController {
 	@Path("/excel/base64/{reportid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = Base64DownloadFileDTO.class)))
 	public Response getPreviewExcelBase64(TableReportParameterDTO tableReportParameterDTO,
 			@PathParam("reportid") Long reportId) {
@@ -80,7 +75,6 @@ public class PreviewReportController {
 	@Path("/jasper/{reportid}")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ByteArrayOutputStream.class)))
 	public Response getJasperReport(TableReportParameterDTO tableReportParameterDTO,
 			@PathParam("reportid") Long reportId) {
@@ -92,7 +86,6 @@ public class PreviewReportController {
 	@Path("/jasper/base64/{reportid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = Base64DownloadFileDTO.class)))
 	public Response getJasperReportBase64(TableReportParameterDTO tableReportParameterDTO,
 			@PathParam("reportid") Long reportId) {
@@ -104,7 +97,6 @@ public class PreviewReportController {
 	@Path("/execute/{reportid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = SqlExecuteResultDTO.class)))
 	public Response getExecuteReport(TableReportParameterDTO tableReportParameterDTO,
 			@PathParam("reportid") Long reportId) {

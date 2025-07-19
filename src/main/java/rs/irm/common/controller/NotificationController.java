@@ -4,7 +4,6 @@ package rs.irm.common.controller;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -31,7 +30,6 @@ public class NotificationController {
 	@GET
 	@Path("/count")
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = NotificationCountDTO.class)))
 	public Response getCount() {
 		return Response.ok(notificationService.getCount()).build();
@@ -41,7 +39,6 @@ public class NotificationController {
 	@Path("/table")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	public Response getTable(
 			TableParameterDTO tableParameterDTO
@@ -52,7 +49,6 @@ public class NotificationController {
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = NotificationDTO.class)))
 	public Response getRead(
 			@PathParam("id") Long id
@@ -63,7 +59,6 @@ public class NotificationController {
 	@GET
 	@Path("/markunread/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = NotificationDTO.class)))
 	public Response markAsUnread(
 			@PathParam("id") Long id

@@ -3,7 +3,6 @@ package rs.irm.administration.controller;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -34,7 +33,6 @@ public class SmtpServerController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed(value = { "admin" })
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	public Response getTable(
 			TableParameterDTO tableParameterDTO
@@ -46,7 +44,6 @@ public class SmtpServerController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed(value = { "admin" })
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = SmtpServerDTO.class)))
 	public Response getTable(
 			@Valid SmtpServerDTO smtpServerDTO
@@ -57,7 +54,6 @@ public class SmtpServerController {
 	@DELETE
 	@Path("/{id}")
 	@RolesAllowed(value = { "admin" })
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "204",description = "No content")
 	public Response getDelete(
 			@PathParam("id") Long id
@@ -70,7 +66,6 @@ public class SmtpServerController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/testsmtp/{id}")
 	@RolesAllowed(value = { "admin" })
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "204",description = "No content")
 	public Response getTestMail(
 			@Valid TestSmtpDTO testSmtpDTO,

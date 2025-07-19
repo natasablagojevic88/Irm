@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -37,7 +36,6 @@ public class PreviewModelController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
-	@SecurityRequirement(name = "JWT")
 	public Response getTable(TableParameterDTO tableParameterDTO, @PathParam("modelid") Long modelID,
 			@PathParam("parentid") Long parentId) {
 		return Response.ok(previewModelService.getTable(tableParameterDTO, modelID, parentId, true)).build();
@@ -47,7 +45,6 @@ public class PreviewModelController {
 	@Path("/defaultvalues/{modelid}/{parentid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = LinkedHashMap.class)))
-	@SecurityRequirement(name = "JWT")
 	public Response getDefaultValues(@PathParam("modelid") Long modelID, @PathParam("parentid") Long parentId) {
 		return Response.ok(previewModelService.getDefaultValues(modelID, parentId)).build();
 	}
@@ -56,7 +53,6 @@ public class PreviewModelController {
 	@Path("/codebooks/{modelid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = LinkedHashMap.class)))
-	@SecurityRequirement(name = "JWT")
 	public Response getCodebooks(@PathParam("modelid") Long modelID) {
 		return Response.ok(previewModelService.getCodebooks(modelID)).build();
 	}
@@ -66,7 +62,6 @@ public class PreviewModelController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
-	@SecurityRequirement(name = "JWT")
 	public Response getCodebooksTable(TableParameterDTO tableParameterDTO, @PathParam("modelId") Long modelId,
 			@PathParam("codebook") String codebook, @PathParam("parentid") Long parentid) {
 		return Response.ok(previewModelService.getCodebooksTable(tableParameterDTO, modelId, codebook, parentid))
@@ -76,7 +71,6 @@ public class PreviewModelController {
 	@GET
 	@Path("/subcodebooks/{modelid}/{codebook}/{codebookvalue}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = SubCodebookInfoDTO.class)))
 	public Response getSubCodebooks(@PathParam("modelid") Long modelID, @PathParam("codebook") String codebook,
 			@PathParam("codebookvalue") Long codebookValue) {
@@ -87,7 +81,6 @@ public class PreviewModelController {
 	@Path("/{modelid}/{parentid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = LinkedHashMap.class)))
 	public Response getUpdate(LinkedHashMap<String, Object> item, @PathParam("modelid") Long modelId,
 			@PathParam("parentid") Long parentId) {
@@ -96,7 +89,6 @@ public class PreviewModelController {
 
 	@DELETE
 	@Path("/{modelid}/{id}")
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "204", description = "No content")
 	public Response getDelete(@PathParam("modelid") Long modelId, @PathParam("id") Long id) {
 		previewModelService.getDelete(modelId, id);
@@ -106,7 +98,6 @@ public class PreviewModelController {
 	@GET
 	@Path("/lock/{modelid}/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = LinkedHashMap.class)))
 	public Response getLock(@PathParam("modelid") Long modelId, @PathParam("id") Long id) {
 
@@ -116,7 +107,6 @@ public class PreviewModelController {
 	@GET
 	@Path("/unlock/{modelid}/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = LinkedHashMap.class)))
 	public Response getUnlock(@PathParam("modelid") Long modelId, @PathParam("id") Long id) {
 
@@ -126,7 +116,6 @@ public class PreviewModelController {
 	@GET
 	@Path("/preview/{modelid}/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = LinkedHashMap.class)))
 	public Response getPreview(@PathParam("modelid") Long modelId, @PathParam("id") Long id) {
 
@@ -136,7 +125,6 @@ public class PreviewModelController {
 	@GET
 	@Path("/excel/template/{modelid}")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ByteArrayOutputStream.class)))
 	public Response getExcelTemplate(@PathParam("modelid") Long modelId) {
 
@@ -146,7 +134,6 @@ public class PreviewModelController {
 	@GET
 	@Path("/excel/template/{modelid}/base64")
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = Base64DownloadFileDTO.class)))
 	public Response getExcelTemplateBase64(@PathParam("modelid") Long modelId) {
 
@@ -157,7 +144,6 @@ public class PreviewModelController {
 	@Path("/checktotal/{modelid}/{parentid}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
 	public Response getCheckTotal(TableParameterDTO tableParameterDTO, @PathParam("modelid") Long modelID,
 			@PathParam("parentid") Long parentId) {
@@ -168,7 +154,6 @@ public class PreviewModelController {
 	@Path("/excel/import/{modelid}/{parentid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = LinkedHashMap.class)))
 	public Response getExcelImport(
 			File excelFile,
@@ -182,7 +167,6 @@ public class PreviewModelController {
 	@GET
 	@Path("/jasper/{jasperreportid}/{id}")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ByteArrayOutputStream.class)))
 	public Response getPrintJasper(
 			@PathParam("jasperreportid") Long jasperReportId,
@@ -195,7 +179,6 @@ public class PreviewModelController {
 	@GET
 	@Path("/jasper/{jasperreportid}/{id}/base64")
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = Base64DownloadFileDTO.class)))
 	public Response getPrintJasperBase64(
 			@PathParam("jasperreportid") Long jasperReportId,
@@ -209,7 +192,6 @@ public class PreviewModelController {
 	@Path("/changeevent/{modelid}/{parentid}/{jsonfuntion}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = LinkedHashMap.class)))
 	public Response getChangeEvent(
 			LinkedHashMap<String,Object> value,
@@ -225,7 +207,6 @@ public class PreviewModelController {
 	@Path("/codebookdisabled/{modelid}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = LinkedHashMap.class)))
 	public Response getCodebookDisabled(
 			LinkedHashMap<String,Object> value,
@@ -239,7 +220,6 @@ public class PreviewModelController {
 	
 	@GET
 	@Path("/procedure/{procedureid}/{modelid}/{id}")
-	@SecurityRequirement(name = "JWT")
 	@ApiResponse(responseCode = "204", description = "No content")
 	public Response getProcedureExecute(
 			@PathParam("procedureid") Long procedureId,

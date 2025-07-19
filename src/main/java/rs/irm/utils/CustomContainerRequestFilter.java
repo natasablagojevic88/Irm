@@ -10,6 +10,7 @@ import java.lang.reflect.Parameter;
 import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
@@ -37,11 +39,13 @@ import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import rs.irm.administration.dto.RoleForUserDTO;
 import rs.irm.administration.entity.AppUser;
+import rs.irm.common.dto.TokenDatabaseDTO;
+import rs.irm.common.entity.TokenDatabase;
 import rs.irm.common.exceptions.CommonException;
 import rs.irm.common.exceptions.FieldRequiredException;
 import rs.irm.common.exceptions.MaximumException;
 import rs.irm.common.exceptions.MinimumException;
-import rs.irm.common.service.TokenService;
+import rs.irm.common.service.LoginService;
 import rs.irm.database.dto.TableParameterDTO;
 import rs.irm.database.enums.SearchOperation;
 import rs.irm.database.service.DatatableService;
@@ -52,6 +56,9 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 	@Context
 	private HttpServletRequest httpServletRequest;
 
+	@Context
+	private HttpServletResponse httpServletResponse;
+
 	@Inject
 	private DatatableService datatableService;
 
@@ -59,7 +66,7 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 	private ResourceInfo resourceInfo;
 
 	@Inject
-	private TokenService tokenService;
+	private LoginService loginService;
 
 	@Override
 	public void filter(ContainerRequestContext containerRequestContext) throws IOException {
@@ -67,7 +74,7 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 		checkRequestField(containerRequestContext);
 
 		if (httpServletRequest.getPathInfo().equals("/openapi.json")
-				|| httpServletRequest.getPathInfo().startsWith("/login")) {
+				|| httpServletRequest.getPathInfo().equals("/login")) {
 			return;
 		}
 
@@ -183,53 +190,80 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 
 	private void checkToken() {
 
-		String token = httpServletRequest.getHeader("Authorization");
+		LocalDateTime now = LocalDateTime.now();
 
-		if (token == null) {
-
-			if (httpServletRequest.getCookies() != null) {
-				Map<String, String> parameters = new HashMap<>();
-				for (Cookie cookie : httpServletRequest.getCookies()) {
-					parameters.put(cookie.getName(), cookie.getValue());
-				}
-
-				if (parameters.containsKey("session")) {
-					token = parameters.get("session");
-				}
-
-			}
-		} else {
-			token = token.substring(7);
+		if (httpServletRequest.getCookies() == null) {
+			removeCookies();
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "noCookie", null);
 		}
 
-		tokenService.validToken(token);
+		Map<String, String> parameters = new HashMap<>();
+		for (Cookie cookie : httpServletRequest.getCookies()) {
+			parameters.put(cookie.getName(), cookie.getValue());
+		}
+
+		String session = parameters.get("session");
+		String refresh_token = parameters.get("refresh_token");
+		String lang = parameters.get("lang");
+
+		if (session == null || refresh_token == null) {
+			removeCookies();
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "noCookie", null);
+		}
 
 		TableParameterDTO tableParameterDTO = new TableParameterDTO();
-		TableFilter tableFilter = new TableFilter();
-		tableFilter.setField("username");
-		tableFilter.setParameter1(tokenService.getUsername(token));
-		tableFilter.setSearchOperation(SearchOperation.equals);
-		tableParameterDTO.getTableFilters().add(tableFilter);
-		List<AppUser> appUsers = datatableService.findAll(tableParameterDTO, AppUser.class);
+		tableParameterDTO.getTableFilters().add(new TableFilter("sessionToken", SearchOperation.equals, session, null));
+		List<TokenDatabaseDTO> tokenDatabaseDTOs = this.datatableService.findAll(tableParameterDTO,
+				TokenDatabaseDTO.class);
 
-		if (appUsers.isEmpty()) {
-			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "wrongUsername", null);
+		if (tokenDatabaseDTOs.isEmpty()) {
+			removeCookies();
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "wrongToken", null);
 		}
 
-		AppUser appUser = appUsers.get(0);
+		TokenDatabaseDTO tokenDatabaseDTO = tokenDatabaseDTOs.get(0);
 
-		if (!appUser.getActive()) {
-			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "userIsNotActive", appUser.getUsername());
+		if (!tokenDatabaseDTO.getAppUserActive()) {
+			removeCookies();
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "userIsNotActive",
+					tokenDatabaseDTO.getAppUserUsername());
+		}
+		
+		if (!tokenDatabaseDTO.getRefreshToken().equals(refresh_token)) {
+			removeCookies();
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "wrongRefreshToken",
+					tokenDatabaseDTO.getAppUserUsername());
 		}
 
-		httpServletRequest.setAttribute("username", appUser.getUsername());
-		httpServletRequest.setAttribute("userid", appUser.getId());
-		httpServletRequest.setAttribute("language", tokenService.getLanguage(token));
+		if (!tokenDatabaseDTO.getActive()) {
+			removeCookies();
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "wrongToken", null);
+		}
+
+		if (now.isAfter(tokenDatabaseDTO.getSessionEnd()) && now.isAfter(tokenDatabaseDTO.getRefreshEnd())) {
+			removeCookies();
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "tokenExpired", null);
+		}
+
+		if (now.isAfter(tokenDatabaseDTO.getSessionEnd())) {
+			TokenDatabase tokenDatabase = this.loginService.insertTokenToBase(tokenDatabaseDTO.getId(),
+					new AppUser(tokenDatabaseDTO.getAppUserId()), true);
+			session=tokenDatabase.getSessionToken();
+			httpServletResponse.addCookie(loginService.createCookie("session", tokenDatabase.getSessionToken(),
+					AppParameters.refreshtokenduration.intValue() * 60));
+			httpServletResponse.addCookie(loginService.createCookie("refresh_token", tokenDatabase.getRefreshToken(),
+					AppParameters.refreshtokenduration.intValue() * 60));
+		}
+
+		httpServletRequest.setAttribute("username", tokenDatabaseDTO.getAppUserUsername());
+		httpServletRequest.setAttribute("userid", tokenDatabaseDTO.getAppUserId());
+		httpServletRequest.setAttribute("language", lang);
+		httpServletRequest.setAttribute("session", session);
 
 		tableParameterDTO = new TableParameterDTO();
-		tableFilter = new TableFilter();
+		TableFilter tableFilter = new TableFilter();
 		tableFilter.setField("appUserId");
-		tableFilter.setParameter1(String.valueOf(appUser.getId()));
+		tableFilter.setParameter1(String.valueOf(tokenDatabaseDTO.getAppUserId()));
 		tableFilter.setSearchOperation(SearchOperation.equals);
 		tableParameterDTO.getTableFilters().add(tableFilter);
 		List<RoleForUserDTO> userRoleDTOs = datatableService.findAll(tableParameterDTO, RoleForUserDTO.class);
@@ -254,6 +288,12 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 				throw new CommonException(HttpURLConnection.HTTP_FORBIDDEN, "NoRight", null);
 			}
 		}
+	}
+
+	private void removeCookies() {
+		this.httpServletResponse.addCookie(loginService.createCookie("session", null, 0));
+		this.httpServletResponse.addCookie(loginService.createCookie("refresh_token", null, 0));
+		this.httpServletResponse.addCookie(loginService.createCookie("lang", null, 0));
 	}
 
 }

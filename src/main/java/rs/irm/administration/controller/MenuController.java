@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -24,7 +23,6 @@ public class MenuController {
 	private MenuService menuService;
 	
 	@GET
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(array = @ArraySchema(schema = @Schema(implementation = MenuDTO.class))))
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMenu() {
@@ -33,7 +31,6 @@ public class MenuController {
 	
 	@GET
 	@Path("/dashboard")
-	@SecurityRequirement(name="JWT")
 	@ApiResponse(responseCode = "200",description = "Response",content = @Content(array = @ArraySchema(schema = @Schema(implementation = DashboardResultDTO.class))))
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDefaultDashboard() {
