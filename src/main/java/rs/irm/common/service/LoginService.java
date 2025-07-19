@@ -4,7 +4,6 @@ import java.util.List;
 
 import rs.irm.common.dto.ComboboxDTO;
 import rs.irm.common.dto.LoginDTO;
-import rs.irm.common.dto.PublicKeyDTO;
 
 public interface LoginService {
 	
@@ -13,7 +12,5 @@ public interface LoginService {
 	List<ComboboxDTO> language();
 	
 	void logout();
-	
-	PublicKeyDTO addSession();
 
 }

@@ -28,7 +28,7 @@
 
 	<!-- dev , production -->
 	<Environment name="keystoretype" type="java.lang.String"
-		value="dev" />
+		value="production" />
 
 	<Environment name="jasperfilepath" type="java.lang.String"
 		value=".jasperReports" />
@@ -50,5 +50,8 @@
 		
 	<Environment name="loadjobs"
 		type="java.lang.Boolean" value="true" />
+		
+	<Environment name="privatekeysecret"
+		type="java.lang.String" value="anc5a3dlbDh2MGJ0encwZg==" />
 
 </Context>

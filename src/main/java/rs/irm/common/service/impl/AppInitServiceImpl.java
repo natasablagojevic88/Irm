@@ -10,17 +10,23 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
@@ -64,6 +70,7 @@ import rs.irm.administration.service.LoadReportJobService;
 import rs.irm.administration.service.impl.LoadReportJobServiceImpl;
 import rs.irm.administration.utils.ModelData;
 import rs.irm.common.dto.ComboboxDTO;
+import rs.irm.common.entity.KeyStorage;
 import rs.irm.common.service.AppInitService;
 import rs.irm.common.utils.CheckAdmin;
 import rs.irm.database.dto.TableParameterDTO;
@@ -297,10 +304,42 @@ public class AppInitServiceImpl implements AppInitService {
 				AppKeys.publicKey = keyStore.getCertificate(keystoreAlias).getPublicKey();
 				AppKeys.privateKey = (PrivateKey) keyStore.getKey(keystoreAlias, keystorePassword.toCharArray());
 			} else {
-				KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-				KeyPair keyPair = keyPairGenerator.generateKeyPair();
-				AppKeys.publicKey = keyPair.getPublic();
-				AppKeys.privateKey = keyPair.getPrivate();
+				
+				List<KeyStorage> keyStorages=this.datatableService.findAll(new TableParameterDTO(), KeyStorage.class);
+				byte[] decodedKey = Base64.getDecoder().decode(AppParameters.privatekeysecret);
+		        SecretKeySpec restoredKey = new SecretKeySpec(decodedKey, "AES");
+				if(keyStorages.isEmpty()) {
+					KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+					KeyPair keyPair = keyPairGenerator.generateKeyPair();
+					AppKeys.publicKey = keyPair.getPublic();
+					AppKeys.privateKey = keyPair.getPrivate();
+					
+					KeyStorage keyStorage=new KeyStorage();
+
+			        Cipher cipher = Cipher.getInstance("AES");
+			        cipher.init(Cipher.ENCRYPT_MODE, restoredKey);
+			        
+			        byte[] encryptedPrivateKey=cipher.doFinal(AppKeys.privateKey.getEncoded());
+			        keyStorage.setId(0L);
+			        keyStorage.setPrivateKey(encryptedPrivateKey);
+			        keyStorage.setPublicKey(AppKeys.publicKey.getEncoded());
+			        this.datatableService.save(keyStorage);
+			        
+				}else {
+					KeyStorage keyStorage=keyStorages.get(0);
+					Cipher cipher = Cipher.getInstance("AES");
+			        cipher.init(Cipher.DECRYPT_MODE, restoredKey);
+			        
+			        byte[] privateKeyBytes=cipher.doFinal(keyStorage.getPrivateKey());
+			        byte[] publicKeyBytes=keyStorage.getPublicKey();
+			        PKCS8EncodedKeySpec encodedPrivateKeySpec=new PKCS8EncodedKeySpec(privateKeyBytes);
+			        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+			        AppKeys.privateKey=keyFactory.generatePrivate(encodedPrivateKeySpec);
+			        X509EncodedKeySpec encodedPublicKeySpec=new X509EncodedKeySpec(publicKeyBytes);
+			        AppKeys.publicKey=keyFactory.generatePublic(encodedPublicKeySpec);
+				}
+				
+				
 
 			}
 

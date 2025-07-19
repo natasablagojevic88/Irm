@@ -17,7 +17,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import rs.irm.common.dto.ComboboxDTO;
 import rs.irm.common.dto.LoginDTO;
-import rs.irm.common.dto.PublicKeyDTO;
 import rs.irm.common.service.LoginService;
 
 @Path("/login")
@@ -54,16 +53,6 @@ public class LoginController {
 		this.loginService.logout();
 		return Response.noContent().build();
 	}
-	
-	@ApiResponse(responseCode = "200",description = "Response",content = @Content(schema = @Schema(implementation = PublicKeyDTO.class)))
-	@GET
-	@Path("/addsession")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	@SecurityRequirement(name="JWT")
-	public Response addSession() {
-		
-		return Response.ok(this.loginService.addSession()).build();
-	}
+
 
 }

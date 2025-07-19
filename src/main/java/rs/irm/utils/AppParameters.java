@@ -16,5 +16,6 @@ public class AppParameters {
 	public static Boolean production;
 	public static String remoteaddrheader;
 	public static Boolean loadjobs;
+	public static String privatekeysecret;
 
 }

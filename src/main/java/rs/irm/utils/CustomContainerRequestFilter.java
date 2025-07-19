@@ -23,7 +23,6 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
@@ -42,7 +41,6 @@ import rs.irm.common.exceptions.CommonException;
 import rs.irm.common.exceptions.FieldRequiredException;
 import rs.irm.common.exceptions.MaximumException;
 import rs.irm.common.exceptions.MinimumException;
-import rs.irm.common.exceptions.WrongTokenException;
 import rs.irm.common.service.TokenService;
 import rs.irm.database.dto.TableParameterDTO;
 import rs.irm.database.enums.SearchOperation;
@@ -184,11 +182,7 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 	}
 
 	private void checkToken() {
-		HttpSession session = this.httpServletRequest.getSession(false);
 
-		if (session == null &&AppParameters.production) {
-			throw new WrongTokenException(null);
-		}
 		String token = httpServletRequest.getHeader("Authorization");
 
 		if (token == null) {
