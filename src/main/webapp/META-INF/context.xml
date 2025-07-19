@@ -47,5 +47,8 @@
 		
 	<Environment name="remoteaddrheader"
 		type="java.lang.String" value="X-Real-IP" />
+		
+	<Environment name="loadjobs"
+		type="java.lang.Boolean" value="true" />
 
 </Context>

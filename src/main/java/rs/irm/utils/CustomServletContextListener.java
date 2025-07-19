@@ -43,7 +43,10 @@ public class CustomServletContextListener implements ServletContextListener {
 		appInitService.closeConnections();
 
 		try {
-			AppInitServiceImpl.scheduler.shutdown(true);
+			if(AppInitServiceImpl.scheduler!=null) {
+				AppInitServiceImpl.scheduler.shutdown(true);
+			}
+			
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}

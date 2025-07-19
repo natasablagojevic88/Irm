@@ -135,7 +135,7 @@ public class ReportController {
 	}
 	
 	@POST
-	@Path("/job")
+	@Path("/report-job")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@ApiResponse(responseCode = "200", description = "Response",content = @Content(schema = @Schema(implementation = ReportJobDTO.class)))
@@ -149,7 +149,7 @@ public class ReportController {
 	}
 	
 	@DELETE
-	@Path("/job/{id}")
+	@Path("/report-job/{id}")
 	@ApiResponse(responseCode = "204", description = "No content")
 	@SecurityRequirement(name = "JWT")
 	@RolesAllowed(value = { "admin" })

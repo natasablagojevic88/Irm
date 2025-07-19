@@ -99,16 +99,17 @@ public class JobInfoServiceImpl implements JobInfoService {
 
 		List<JobInfoDTO> jobInfoDTOs = new ArrayList<>();
 		try {
+			if(AppInitServiceImpl.scheduler!=null) {
+				Set<JobKey> setOfKeys = AppInitServiceImpl.scheduler
+						.getJobKeys(GroupMatcher.groupEquals(LoadReportJobServiceImpl.jobGroup));
 
-			Set<JobKey> setOfKeys = AppInitServiceImpl.scheduler
-					.getJobKeys(GroupMatcher.groupEquals(LoadReportJobServiceImpl.jobGroup));
+				Iterator<JobKey> iterator = setOfKeys.iterator();
 
-			Iterator<JobKey> iterator = setOfKeys.iterator();
+				while (iterator.hasNext()) {
+					JobKey jobKey = iterator.next();
 
-			while (iterator.hasNext()) {
-				JobKey jobKey = iterator.next();
-
-				jobInfoDTOs.add(createJobInfoDTO(jobKey));
+					jobInfoDTOs.add(createJobInfoDTO(jobKey));
+				}
 			}
 
 		} catch (Exception e) {
@@ -121,6 +122,10 @@ public class JobInfoServiceImpl implements JobInfoService {
 
 	private JobInfoDTO createJobInfoDTO(JobKey jobKey) {
 		JobInfoDTO jobInfoDTO = new JobInfoDTO();
+		
+		if(AppInitServiceImpl.scheduler==null) {
+			return jobInfoDTO;
+		}
 
 		ReportJobDTO reportJobDTO = ModelData.listReportJobDTOs.stream()
 				.filter(a -> a.getName().equals(jobKey.getName())).findFirst().get();
@@ -187,8 +192,11 @@ public class JobInfoServiceImpl implements JobInfoService {
 				.filter(a -> a.getId().doubleValue() == id.doubleValue()).findFirst().get();
 
 		try {
-			AppInitServiceImpl.scheduler
-					.triggerJob(new JobKey(reportJobDTO.getName(), LoadReportJobServiceImpl.jobGroup));
+			if(AppInitServiceImpl.scheduler!=null) {
+				AppInitServiceImpl.scheduler
+				.triggerJob(new JobKey(reportJobDTO.getName(), LoadReportJobServiceImpl.jobGroup));
+			}
+			
 		} catch (SchedulerException e) {
 			throw new WebApplicationException(e);
 		}

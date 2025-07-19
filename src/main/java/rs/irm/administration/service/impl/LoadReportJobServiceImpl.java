@@ -27,6 +27,11 @@ public class LoadReportJobServiceImpl implements LoadReportJobService {
 	public void loadJob(ReportJob reportJob) {
 		this.jobName = reportJob.getName();
 		this.triggerName = reportJob.getId().toString();
+		
+		if(AppInitServiceImpl.scheduler==null) {
+			return;
+		}
+		
 		try {
 			if (AppInitServiceImpl.scheduler.checkExists(new JobKey(jobName, jobGroup))) {
 				if (reportJob.getActive()) {
@@ -73,6 +78,11 @@ public class LoadReportJobServiceImpl implements LoadReportJobService {
 	public void removeJob(ReportJob reportJob) {
 		this.jobName = reportJob.getName();
 		try {
+			
+			if(AppInitServiceImpl.scheduler==null) {
+				return;
+			}
+			
 			if (AppInitServiceImpl.scheduler.checkExists(new JobKey(jobName, jobGroup))) {
 				AppInitServiceImpl.scheduler.deleteJob(new JobKey(jobName, jobGroup));
 				

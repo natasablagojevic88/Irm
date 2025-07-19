@@ -363,6 +363,11 @@ public class AppInitServiceImpl implements AppInitService {
 	public void initQuart() {
 
 		try {
+			
+			if(!AppParameters.loadjobs) {
+				return;
+			}
+			
 			SchedulerFactory schedulerFactory = new StdSchedulerFactory();
 			scheduler = schedulerFactory.getScheduler();
 
