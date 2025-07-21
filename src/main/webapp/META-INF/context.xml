@@ -19,11 +19,13 @@
 	<Environment name="checkconnection" type="java.lang.String"
 		value="select 1" />
 
+	<!-- time in minutes -->
 	<Environment name="sessionduration" type="java.lang.Integer"
-		value="1" />
+		value="10" />
 		
+	<!-- time in minutes -->
 	<Environment name="refreshtokenduration" type="java.lang.Integer"
-		value="15" />
+		value="10080" />
 
 	<!-- srRS , srLatnRS , enUS -->
 	<Environment name="defaultlang" type="java.lang.String"

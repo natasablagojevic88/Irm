@@ -332,10 +332,6 @@ public class AppInitServiceImpl implements AppInitService {
 
 		try {
 			
-			if(!AppParameters.loadjobs) {
-				return;
-			}
-			
 			SchedulerFactory schedulerFactory = new StdSchedulerFactory();
 			scheduler = schedulerFactory.getScheduler();
 
@@ -350,6 +346,10 @@ public class AppInitServiceImpl implements AppInitService {
 
 			scheduler.scheduleJob(jobCheckConnection, triggerCheckConnection);
 			scheduler.start();
+
+			if(!AppParameters.loadjobs) {
+				return;
+			}
 
 			List<ReportJob> reportJobs = this.datatableService.findAll(new TableParameterDTO(), ReportJob.class);
 
