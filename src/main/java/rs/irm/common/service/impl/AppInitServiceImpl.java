@@ -80,7 +80,7 @@ import rs.irm.utils.RemoveInactiveTokenJob;
 
 public class AppInitServiceImpl implements AppInitService {
 	Logger logger = LogManager.getLogger(AppInitServiceImpl.class);
-	public static String contextPath;
+	public static String contextPath="";
 
 	private DatatableService datatableService = new DatatableServiceImpl();
 	private LoadReportJobService loadReportJobService = new LoadReportJobServiceImpl();
