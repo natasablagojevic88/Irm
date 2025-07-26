@@ -10,6 +10,8 @@ public interface AppInitService {
 	
 	void createTables();
 	
+	void checkNotificationListener();
+	
 	void loadIcons();
 	
 	void loadModel();
@@ -19,4 +21,5 @@ public interface AppInitService {
 	void initQuart();
 	
 	void initJasperReports();
+	
 }

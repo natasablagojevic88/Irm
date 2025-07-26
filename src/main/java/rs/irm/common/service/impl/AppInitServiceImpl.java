@@ -62,6 +62,10 @@ import rs.irm.administration.utils.ModelData;
 import rs.irm.common.dto.ComboboxDTO;
 import rs.irm.common.service.AppInitService;
 import rs.irm.common.utils.CheckAdmin;
+import rs.irm.common.utils.CheckNotificationTrigger;
+import rs.irm.common.utils.CreateNotificationListenerTrigger;
+import rs.irm.common.utils.CreateNotificatonFunction;
+import rs.irm.common.utils.ReadNotificationFunction;
 import rs.irm.database.dto.TableParameterDTO;
 import rs.irm.database.enums.BaseType;
 import rs.irm.database.service.DatatableService;
@@ -80,7 +84,7 @@ import rs.irm.utils.RemoveInactiveTokenJob;
 
 public class AppInitServiceImpl implements AppInitService {
 	Logger logger = LogManager.getLogger(AppInitServiceImpl.class);
-	public static String contextPath="";
+	public static String contextPath = "";
 
 	private DatatableService datatableService = new DatatableServiceImpl();
 	private LoadReportJobService loadReportJobService = new LoadReportJobServiceImpl();
@@ -282,6 +286,49 @@ public class AppInitServiceImpl implements AppInitService {
 	}
 
 	@Override
+	public void checkNotificationListener() {
+		String functionString = "";
+
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+				this.getClass().getClassLoader().getResourceAsStream("notification_listener.sql")));
+
+		String row;
+
+		try {
+			while ((row = bufferedReader.readLine()) != null) {
+				functionString += row + "\n";
+			}
+
+			bufferedReader.close();
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			throw new WebApplicationException(e);
+		}
+
+		ReadNotificationFunction readNotificationFunction = new ReadNotificationFunction();
+		String function = this.datatableService.executeMethodWithReturn(readNotificationFunction);
+
+		if (function == null) {
+			CreateNotificatonFunction createNotificationFunction = new CreateNotificatonFunction();
+			this.datatableService.executeMethod(createNotificationFunction);
+		} else {
+			if (!function.equals(functionString.split("\\$function\\$")[1])) {
+				CreateNotificatonFunction createNotificationFunction = new CreateNotificatonFunction();
+				this.datatableService.executeMethod(createNotificationFunction);
+			}
+		}
+		
+		CheckNotificationTrigger checkTrigger=new CheckNotificationTrigger();
+		Long count=this.datatableService.executeMethodWithReturn(checkTrigger);
+		
+		if(count.doubleValue()==0) {
+			CreateNotificationListenerTrigger createNotificationListenerTrigger=new CreateNotificationListenerTrigger();
+			this.datatableService.executeMethod(createNotificationListenerTrigger);
+		}
+
+	}
+
+	@Override
 	public void loadIcons() {
 		try {
 			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("icons.csv");
@@ -334,7 +381,7 @@ public class AppInitServiceImpl implements AppInitService {
 	public void initQuart() {
 
 		try {
-			
+
 			SchedulerFactory schedulerFactory = new StdSchedulerFactory();
 			scheduler = schedulerFactory.getScheduler();
 
@@ -343,35 +390,30 @@ public class AppInitServiceImpl implements AppInitService {
 					.withSchedule(CronScheduleBuilder.cronSchedule(AppParameters.checkconnectioncron)).build();
 
 			JobDetail jobCheckConnection = JobBuilder.newJob(CheckConnectionJob.class)
-					.withIdentity("checkConnection", "checkConnection")
-					.build();
+					.withIdentity("checkConnection", "checkConnection").build();
 
 			scheduler.scheduleJob(jobCheckConnection, triggerCheckConnection);
 			scheduler.start();
 
-			if(!AppParameters.loadjobs) {
+			if (!AppParameters.loadjobs) {
 				return;
 			}
-			triggerCheckConnection = TriggerBuilder.newTrigger()
-					.withIdentity("checkToken", "checkToken")
+			triggerCheckConnection = TriggerBuilder.newTrigger().withIdentity("checkToken", "checkToken")
 					.withSchedule(CronScheduleBuilder.cronSchedule(AppParameters.removeinactivetokencron)).build();
 
 			jobCheckConnection = JobBuilder.newJob(RemoveInactiveTokenJob.class)
-					.withIdentity("checkToken", "checkToken")
-					.build();
+					.withIdentity("checkToken", "checkToken").build();
 
 			scheduler.scheduleJob(jobCheckConnection, triggerCheckConnection);
-			
-			triggerCheckConnection = TriggerBuilder.newTrigger()
-					.withIdentity("checkNotification", "checkNotification")
+
+			triggerCheckConnection = TriggerBuilder.newTrigger().withIdentity("checkNotification", "checkNotification")
 					.withSchedule(CronScheduleBuilder.cronSchedule(AppParameters.checknotificationcron)).build();
 
 			jobCheckConnection = JobBuilder.newJob(CheckNotificationJob.class)
-					.withIdentity("checkNotification", "checkNotification")
-					.build();
+					.withIdentity("checkNotification", "checkNotification").build();
 
 			scheduler.scheduleJob(jobCheckConnection, triggerCheckConnection);
-			
+
 			List<ReportJob> reportJobs = this.datatableService.findAll(new TableParameterDTO(), ReportJob.class);
 
 			for (ReportJob reportJob : reportJobs) {
@@ -410,26 +452,25 @@ public class AppInitServiceImpl implements AppInitService {
 				throw new WebApplicationException(e);
 			}
 		}
-		
+
 		File jasperReportFolder = new File(AppParameters.jasperreportpath);
 
 		if (!(jasperReportFolder.exists() && jasperReportFolder.isDirectory())) {
 			jasperReportFolder.mkdirs();
 		}
 
-		List<ReportJasper> reportJaspers=this.datatableService.findAll(new TableParameterDTO(), ReportJasper.class);
-		
-		for(ReportJasper reportJasper:reportJaspers) {
-			File jasperFile = new File(
-					jasperReportFolder.getAbsolutePath() + "/" + reportJasper.getName());
+		List<ReportJasper> reportJaspers = this.datatableService.findAll(new TableParameterDTO(), ReportJasper.class);
+
+		for (ReportJasper reportJasper : reportJaspers) {
+			File jasperFile = new File(jasperReportFolder.getAbsolutePath() + "/" + reportJasper.getName());
 
 			if (jasperFile.exists() && jasperFile.isFile()) {
 				continue;
 			}
 
 			try {
-				Files.copy(new ByteArrayInputStream(reportJasper.getBytes()),
-						Paths.get(jasperFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(new ByteArrayInputStream(reportJasper.getBytes()), Paths.get(jasperFile.getAbsolutePath()),
+						StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 				throw new WebApplicationException(e);

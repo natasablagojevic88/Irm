@@ -3,9 +3,9 @@
 
 	<Resource name="jdbc/postgres" auth="Container"
 		type="javax.sql.DataSource" maxTotal="100" maxIdle="100"
-		username="nbirm" password="nbirm"
+		username="natasa" password="22maj88"
 		driverClassName="org.postgresql.Driver"
-		url="jdbc:postgresql://localhost:5432/nbirm" />
+		url="jdbc:postgresql://localhost:5432/irm2" />
 
 	<Environment name="numofconnections"
 		type="java.lang.Integer" value="5" />
