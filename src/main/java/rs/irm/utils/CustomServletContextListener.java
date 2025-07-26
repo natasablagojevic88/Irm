@@ -27,27 +27,33 @@ public class CustomServletContextListener implements ServletContextListener {
 		appInitService.checkAdmin();
 		appInitService.initQuart();
 		appInitService.initJasperReports();
+		new NotificationSocket().sendMessageToUser();
+
+		AppInitServiceImpl.contextPath = sce.getServletContext().getContextPath();
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		try {
-	        Enumeration<Driver> drivers = DriverManager.getDrivers();
-	        while(drivers.hasMoreElements()) {
-	            DriverManager.deregisterDriver(drivers.nextElement());
-	        }
-	    } catch(Exception e) {
-	        logger.error(e);
-	    }
+			Enumeration<Driver> drivers = DriverManager.getDrivers();
+			while (drivers.hasMoreElements()) {
+				DriverManager.deregisterDriver(drivers.nextElement());
+			}
+		} catch (Exception e) {
+			logger.error(e);
+		}
 		appInitService.closeConnections();
 
 		try {
-			if(AppInitServiceImpl.scheduler!=null) {
+			if (AppInitServiceImpl.scheduler != null) {
 				AppInitServiceImpl.scheduler.shutdown(true);
 			}
-			
+
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
+
+		NotificationSocket.senderPool.shutdown();
+		NotificationSocket.sessionQueues.clear();
 	}
 }

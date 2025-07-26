@@ -75,9 +75,12 @@ import rs.irm.database.utils.UniqueData;
 import rs.irm.utils.AppConnections;
 import rs.irm.utils.AppParameters;
 import rs.irm.utils.CheckConnectionJob;
+import rs.irm.utils.CheckNotificationJob;
+import rs.irm.utils.RemoveInactiveTokenJob;
 
 public class AppInitServiceImpl implements AppInitService {
 	Logger logger = LogManager.getLogger(AppInitServiceImpl.class);
+	public static String contextPath;
 
 	private DatatableService datatableService = new DatatableServiceImpl();
 	private LoadReportJobService loadReportJobService = new LoadReportJobServiceImpl();
@@ -341,7 +344,6 @@ public class AppInitServiceImpl implements AppInitService {
 
 			JobDetail jobCheckConnection = JobBuilder.newJob(CheckConnectionJob.class)
 					.withIdentity("checkConnection", "checkConnection")
-
 					.build();
 
 			scheduler.scheduleJob(jobCheckConnection, triggerCheckConnection);
@@ -350,7 +352,26 @@ public class AppInitServiceImpl implements AppInitService {
 			if(!AppParameters.loadjobs) {
 				return;
 			}
+			triggerCheckConnection = TriggerBuilder.newTrigger()
+					.withIdentity("checkToken", "checkToken")
+					.withSchedule(CronScheduleBuilder.cronSchedule(AppParameters.removeinactivetokencron)).build();
 
+			jobCheckConnection = JobBuilder.newJob(RemoveInactiveTokenJob.class)
+					.withIdentity("checkToken", "checkToken")
+					.build();
+
+			scheduler.scheduleJob(jobCheckConnection, triggerCheckConnection);
+			
+			triggerCheckConnection = TriggerBuilder.newTrigger()
+					.withIdentity("checkNotification", "checkNotification")
+					.withSchedule(CronScheduleBuilder.cronSchedule(AppParameters.checknotificationcron)).build();
+
+			jobCheckConnection = JobBuilder.newJob(CheckNotificationJob.class)
+					.withIdentity("checkNotification", "checkNotification")
+					.build();
+
+			scheduler.scheduleJob(jobCheckConnection, triggerCheckConnection);
+			
 			List<ReportJob> reportJobs = this.datatableService.findAll(new TableParameterDTO(), ReportJob.class);
 
 			for (ReportJob reportJob : reportJobs) {

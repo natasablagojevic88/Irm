@@ -11,7 +11,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import jakarta.ws.rs.ApplicationPath;
-import rs.irm.utils.AppParameters;
+import rs.irm.common.service.impl.AppInitServiceImpl;
 import rs.irm.utils.CustomAbstractBinder;
 import rs.irm.utils.CustomContainerRequestFilter;
 
@@ -45,7 +45,7 @@ public class Irm extends ResourceConfig {
 		openAPI.setInfo(info);
 
 		Server server = new Server();
-		server.setUrl(AppParameters.baseurl);
+		server.setUrl(AppInitServiceImpl.contextPath);
 		openAPI.setServers(new ArrayList<Server>() {
 			{
 				add(server);

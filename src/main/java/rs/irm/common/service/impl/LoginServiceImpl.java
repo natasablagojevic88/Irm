@@ -131,7 +131,7 @@ public class LoginServiceImpl implements LoginService {
 		cookie.setHttpOnly(name.equals("lang")?false:true);
 		cookie.setSecure(true);
 		cookie.setMaxAge(duration);
-		cookie.setPath(AppParameters.production ? AppParameters.baseurl : "/");
+		cookie.setPath(AppInitServiceImpl.contextPath);
 		cookie.setAttribute("SameSite", "Strict");
 		return cookie;
 	}

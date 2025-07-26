@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -16,6 +17,10 @@ import rs.irm.administration.entity.AppUser;
    uniqueConstraints = {
 		   @UniqueConstraint(columnNames = { "sessiontoken" },name="tokendatabase_unique_session"),
 		   @UniqueConstraint(columnNames = { "refreshtoken" },name="tokendatabase_unique_refresh")
+   },
+   indexes = {
+		   @Index(columnList = "sessiontoken",name="tokendatabase_sessiontoken_index"),
+		   @Index(columnList = "refreshtoken",name="tokendatabase_refreshtoken_index")
    }
 		)
 @Getter

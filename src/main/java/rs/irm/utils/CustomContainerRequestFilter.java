@@ -49,6 +49,7 @@ import rs.irm.common.service.LoginService;
 import rs.irm.database.dto.TableParameterDTO;
 import rs.irm.database.enums.SearchOperation;
 import rs.irm.database.service.DatatableService;
+import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.TableFilter;
 
 public class CustomContainerRequestFilter implements ContainerRequestFilter {
@@ -189,7 +190,6 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 	}
 
 	private void checkToken() {
-
 		LocalDateTime now = LocalDateTime.now();
 
 		if (httpServletRequest.getCookies() == null) {
@@ -211,38 +211,13 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "noCookie", null);
 		}
 
-		TableParameterDTO tableParameterDTO = new TableParameterDTO();
-		tableParameterDTO.getTableFilters().add(new TableFilter("sessionToken", SearchOperation.equals, session, null));
-		List<TokenDatabaseDTO> tokenDatabaseDTOs = this.datatableService.findAll(tableParameterDTO,
-				TokenDatabaseDTO.class);
-
-		if (tokenDatabaseDTOs.isEmpty()) {
-			removeCookies();
-			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "wrongToken", null);
-		}
-
-		TokenDatabaseDTO tokenDatabaseDTO = tokenDatabaseDTOs.get(0);
-
-		if (!tokenDatabaseDTO.getAppUserActive()) {
-			removeCookies();
-			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "userIsNotActive",
-					tokenDatabaseDTO.getAppUserUsername());
-		}
+		TokenDatabaseDTO tokenDatabaseDTO=null;
 		
-		if (!tokenDatabaseDTO.getRefreshToken().equals(refresh_token)) {
+		try {
+			tokenDatabaseDTO=checkToken(session, refresh_token);
+		}catch(Exception e) {
 			removeCookies();
-			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "wrongRefreshToken",
-					tokenDatabaseDTO.getAppUserUsername());
-		}
-
-		if (!tokenDatabaseDTO.getActive()) {
-			removeCookies();
-			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "wrongToken", null);
-		}
-
-		if (now.isAfter(tokenDatabaseDTO.getSessionEnd()) && now.isAfter(tokenDatabaseDTO.getRefreshEnd())) {
-			removeCookies();
-			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "tokenExpired", null);
+			throw new WebApplicationException(e);
 		}
 
 		if (now.isAfter(tokenDatabaseDTO.getSessionEnd())) {
@@ -260,7 +235,7 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 		httpServletRequest.setAttribute("language", lang);
 		httpServletRequest.setAttribute("session", session);
 
-		tableParameterDTO = new TableParameterDTO();
+		TableParameterDTO tableParameterDTO = new TableParameterDTO();
 		TableFilter tableFilter = new TableFilter();
 		tableFilter.setField("appUserId");
 		tableFilter.setParameter1(String.valueOf(tokenDatabaseDTO.getAppUserId()));
@@ -288,6 +263,43 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 				throw new CommonException(HttpURLConnection.HTTP_FORBIDDEN, "NoRight", null);
 			}
 		}
+	}
+	
+	public TokenDatabaseDTO checkToken(String session,String refresh_token) throws Exception{
+		
+		datatableService=datatableService==null?new DatatableServiceImpl():datatableService;
+
+		LocalDateTime now=LocalDateTime.now();
+		TableParameterDTO tableParameterDTO = new TableParameterDTO();
+		tableParameterDTO.getTableFilters().add(new TableFilter("sessionToken", SearchOperation.equals, session, null));
+		List<TokenDatabaseDTO> tokenDatabaseDTOs = this.datatableService.findAll(tableParameterDTO,
+				TokenDatabaseDTO.class);
+
+		if (tokenDatabaseDTOs.isEmpty()) {
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "wrongToken", null);
+		}
+		
+		TokenDatabaseDTO tokenDatabaseDTO = tokenDatabaseDTOs.get(0);
+
+		if (!tokenDatabaseDTO.getAppUserActive()) {
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "userIsNotActive",
+					tokenDatabaseDTO.getAppUserUsername());
+		}
+		
+		if (!tokenDatabaseDTO.getRefreshToken().equals(refresh_token)) {
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "wrongRefreshToken",
+					tokenDatabaseDTO.getAppUserUsername());
+		}
+
+		if (!tokenDatabaseDTO.getActive()) {
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "wrongToken", null);
+		}
+
+		if (now.isAfter(tokenDatabaseDTO.getSessionEnd()) && now.isAfter(tokenDatabaseDTO.getRefreshEnd())) {
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "tokenExpired", null);
+		}
+		
+		return tokenDatabaseDTO;
 	}
 
 	private void removeCookies() {

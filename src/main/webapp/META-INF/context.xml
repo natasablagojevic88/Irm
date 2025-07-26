@@ -7,14 +7,8 @@
 		driverClassName="org.postgresql.Driver"
 		url="jdbc:postgresql://localhost:5432/nbirm" />
 
-	<Environment name="production"
-		type="java.lang.Boolean" value="false" />
-
 	<Environment name="numofconnections"
 		type="java.lang.Integer" value="5" />
-
-	<Environment name="baseurl" type="java.lang.String"
-		value="/Irm" />
 
 	<Environment name="checkconnection" type="java.lang.String"
 		value="select 1" />
@@ -39,6 +33,12 @@
 
 	<Environment name="checkconnectioncron"
 		type="java.lang.String" value="0 0 1 * * ?" />
+		
+	<Environment name="removeinactivetokencron"
+		type="java.lang.String" value="0 */10 * * * ?" />
+		
+	<Environment name="checknotificationcron"
+		type="java.lang.String" value="* * * * * ?" />
 
 	<Environment name="jobdateformat" type="java.lang.String"
 		value="yyyyMMdd" />

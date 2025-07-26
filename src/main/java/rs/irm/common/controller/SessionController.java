@@ -38,7 +38,12 @@ public class SessionController {
 	@GET
 	@ApiResponse(responseCode = "204",description = "No response")
 	public Response checkSession() {
-		return Response.noContent().build();
+		Response response=Response.noContent()
+				.header("Access-Control-Expose-Headers", "userid")
+				.header("userid", httpServletRequest.getAttribute("userid"))
+				.build();
+		
+		return response;
 	}
 	
 	@Path("/resources/{text}")
