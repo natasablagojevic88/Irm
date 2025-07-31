@@ -79,7 +79,7 @@ import rs.irm.database.utils.UniqueData;
 import rs.irm.utils.AppConnections;
 import rs.irm.utils.AppParameters;
 import rs.irm.utils.CheckConnectionJob;
-import rs.irm.utils.CheckNotificationJob;
+import rs.irm.utils.DatabaseListenerJob;
 import rs.irm.utils.RemoveInactiveTokenJob;
 
 public class AppInitServiceImpl implements AppInitService {
@@ -395,6 +395,14 @@ public class AppInitServiceImpl implements AppInitService {
 			scheduler.scheduleJob(jobCheckConnection, triggerCheckConnection);
 			scheduler.start();
 
+			triggerCheckConnection = TriggerBuilder.newTrigger().withIdentity("databaselistener", "databaselistener")
+					.withSchedule(CronScheduleBuilder.cronSchedule(AppParameters.datatabelistenercron)).build();
+
+			jobCheckConnection = JobBuilder.newJob(DatabaseListenerJob.class)
+					.withIdentity("databaselistener", "databaselistener").build();
+
+			scheduler.scheduleJob(jobCheckConnection, triggerCheckConnection);
+
 			if (!AppParameters.loadjobs) {
 				return;
 			}
@@ -403,14 +411,6 @@ public class AppInitServiceImpl implements AppInitService {
 
 			jobCheckConnection = JobBuilder.newJob(RemoveInactiveTokenJob.class)
 					.withIdentity("checkToken", "checkToken").build();
-
-			scheduler.scheduleJob(jobCheckConnection, triggerCheckConnection);
-
-			triggerCheckConnection = TriggerBuilder.newTrigger().withIdentity("checkNotification", "checkNotification")
-					.withSchedule(CronScheduleBuilder.cronSchedule(AppParameters.checknotificationcron)).build();
-
-			jobCheckConnection = JobBuilder.newJob(CheckNotificationJob.class)
-					.withIdentity("checkNotification", "checkNotification").build();
 
 			scheduler.scheduleJob(jobCheckConnection, triggerCheckConnection);
 

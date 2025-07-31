@@ -18,30 +18,31 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class CheckNotificationJob implements Job {
-	Logger logger = LogManager.getLogger(CheckConnectionJob.class);
+public class DatabaseListenerJob implements Job {
+	Logger logger = LogManager.getLogger(DatabaseListenerJob.class);
 
-	final String listener = "notification_listen";
+	final String notificationListener = "notification_listen";
+	public static String model_listener = "model_listen";
 	ExecutorService websocketSender = Executors.newFixedThreadPool(10);
 
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
 		try {
 			try {
-				Statement statement = AppConnections.checkNotification.createStatement();
+				Statement statement = AppConnections.datatabeListener.createStatement();
 				statement.execute(AppParameters.checkconnection);
 				statement.close();
 			} catch (Exception e) {
 				Context initContext = new InitialContext();
 				Context envContext = (Context) initContext.lookup("java:/comp/env");
 				DataSource dataSource = (DataSource) envContext.lookup("jdbc/postgres");
-				AppConnections.checkNotification = dataSource.getConnection();
+				AppConnections.datatabeListener = dataSource.getConnection();
 
-				Statement statement = AppConnections.checkNotification.createStatement();
-				statement.execute("LISTEN " + listener);
+				Statement statement = AppConnections.datatabeListener.createStatement();
+				statement.execute("LISTEN " + notificationListener);
 				statement.close();
 			}
-			PGConnection pgConnection = AppConnections.checkNotification.unwrap(PGConnection.class);
+			PGConnection pgConnection = AppConnections.datatabeListener.unwrap(PGConnection.class);
 
 			PGNotification[] notifications = pgConnection.getNotifications();
 			if (notifications != null) {

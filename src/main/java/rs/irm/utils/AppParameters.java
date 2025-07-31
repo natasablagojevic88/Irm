@@ -10,7 +10,7 @@ public class AppParameters {
 	public static String jasperfilepath;
 	public static String checkconnectioncron;
 	public static String removeinactivetokencron;
-	public static String checknotificationcron;
+	public static String datatabelistenercron;
 	public static String jasperreportpath;
 	public static String jobdateformat;
 	public static String jobdatetimeformat;

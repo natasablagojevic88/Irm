@@ -3,9 +3,9 @@
 
 	<Resource name="jdbc/postgres" auth="Container"
 		type="javax.sql.DataSource" maxTotal="100" maxIdle="100"
-		username="natasa" password="22maj88"
+		username="nbirm" password="nbirm"
 		driverClassName="org.postgresql.Driver"
-		url="jdbc:postgresql://localhost:5432/irm2" />
+		url="jdbc:postgresql://localhost:5432/nbirm" />
 
 	<Environment name="numofconnections"
 		type="java.lang.Integer" value="5" />
@@ -37,7 +37,7 @@
 	<Environment name="removeinactivetokencron"
 		type="java.lang.String" value="0 */10 * * * ?" />
 		
-	<Environment name="checknotificationcron"
+	<Environment name="datatabelistenercron"
 		type="java.lang.String" value="* * * * * ?" />
 
 	<Environment name="jobdateformat" type="java.lang.String"
