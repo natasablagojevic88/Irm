@@ -1,17 +1,14 @@
 package rs.irm.administration.utils;
 
 import java.sql.Connection;
-import java.sql.Statement;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.entity.ReportJob;
 import rs.irm.administration.service.LoadReportJobService;
 import rs.irm.administration.service.impl.LoadReportJobServiceImpl;
 import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethod;
-import rs.irm.utils.DatabaseListenerJob;
 
 public class DeleteReportJob implements ExecuteMethod {
 
@@ -33,13 +30,6 @@ public class DeleteReportJob implements ExecuteMethod {
 		ReportJob reportJob = this.datatableService.findByExistingId(id, ReportJob.class, connection);
 		this.datatableService.delete(reportJob, connection);
 		this.loadReportJobService.removeJob(reportJob);
-		try {
-			Statement statement = connection.createStatement();
-			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.reportjob_listener + ", 'Report job changed';");
-			statement.close();
-		} catch (Exception e) {
-			throw new WebApplicationException(e);
-		}
 
 	}
 

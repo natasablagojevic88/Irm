@@ -2,11 +2,9 @@ package rs.irm.administration.utils;
 
 import java.net.HttpURLConnection;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.dto.DashboardRoleDTO;
 import rs.irm.administration.entity.Dashboard;
 import rs.irm.administration.entity.DashboardRole;
@@ -18,7 +16,6 @@ import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethod;
 import rs.irm.database.utils.TableFilter;
-import rs.irm.utils.DatabaseListenerJob;
 
 public class DashboardRoleUpdate implements ExecuteMethod {
 
@@ -45,7 +42,8 @@ public class DashboardRoleUpdate implements ExecuteMethod {
 		parameterDTO.getTableFilters()
 				.add(new TableFilter("role", SearchOperation.equals, String.valueOf(dashboardRoleDTO.getId()), null));
 
-		List<DashboardRole> dashboardRoles = this.datatableService.findAll(parameterDTO, DashboardRole.class, connection);
+		List<DashboardRole> dashboardRoles = this.datatableService.findAll(parameterDTO, DashboardRole.class,
+				connection);
 
 		if (dashboardRoleDTO.getHasRight()) {
 			if (!dashboardRoles.isEmpty()) {
@@ -62,14 +60,6 @@ public class DashboardRoleUpdate implements ExecuteMethod {
 			}
 
 			this.datatableService.delete(dashboardRoles.get(0), connection);
-		}
-
-		try {
-			Statement statement = connection.createStatement();
-			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.dashboardrole_listener + ", 'Dashboard role changed';");
-			statement.close();
-		} catch (Exception e) {
-			throw new WebApplicationException(e);
 		}
 
 	}

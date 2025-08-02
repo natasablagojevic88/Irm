@@ -8,7 +8,6 @@ import rs.irm.administration.entity.ModelColumn;
 import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethod;
-import rs.irm.utils.DatabaseListenerJob;
 
 public class DeleteModelColumn implements ExecuteMethod{
 	
@@ -40,14 +39,6 @@ public class DeleteModelColumn implements ExecuteMethod{
 		try {
 			Statement statement=connection.createStatement();
 			statement.executeUpdate(query);
-			statement.close();
-		} catch (Exception e) {
-			throw new WebApplicationException(e);
-		}
-		
-		try {
-			Statement statement = connection.createStatement();
-			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.modelcolumn_listener + ", 'Model column changed';");
 			statement.close();
 		} catch (Exception e) {
 			throw new WebApplicationException(e);

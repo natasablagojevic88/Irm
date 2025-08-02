@@ -10,7 +10,7 @@ public interface AppInitService {
 	
 	void createTables();
 	
-	void checkNotificationListener();
+	void initListener();
 	
 	void loadIcons();
 	

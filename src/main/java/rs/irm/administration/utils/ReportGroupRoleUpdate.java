@@ -2,11 +2,9 @@ package rs.irm.administration.utils;
 
 import java.net.HttpURLConnection;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.dto.ReportGroupRoleDTO;
 import rs.irm.administration.entity.ReportGroup;
 import rs.irm.administration.entity.ReportGroupRole;
@@ -18,7 +16,6 @@ import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethod;
 import rs.irm.database.utils.TableFilter;
-import rs.irm.utils.DatabaseListenerJob;
 
 public class ReportGroupRoleUpdate implements ExecuteMethod {
 
@@ -67,14 +64,6 @@ public class ReportGroupRoleUpdate implements ExecuteMethod {
 			reportGroupRole = this.datatableService.save(reportGroupRole, connection);
 		} else {
 			this.datatableService.delete(list.get(0), connection);
-		}
-		try {
-			Statement statement = connection.createStatement();
-			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.reportgroup_listener + ", 'Report group changed';");
-			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.reportgrouprole_listener + ", 'Report group role changed';");
-			statement.close();
-		} catch (Exception e) {
-			throw new WebApplicationException(e);
 		}
 
 	}

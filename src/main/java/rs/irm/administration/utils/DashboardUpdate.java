@@ -2,13 +2,11 @@ package rs.irm.administration.utils;
 
 import java.net.HttpURLConnection;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.dto.DashboardDTO;
 import rs.irm.administration.entity.Dashboard;
 import rs.irm.administration.entity.DashboardItem;
@@ -19,7 +17,6 @@ import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethodWithReturn;
 import rs.irm.database.utils.TableFilter;
-import rs.irm.utils.DatabaseListenerJob;
 
 public class DashboardUpdate implements ExecuteMethodWithReturn<DashboardDTO> {
 
@@ -61,14 +58,6 @@ public class DashboardUpdate implements ExecuteMethodWithReturn<DashboardDTO> {
 		dashboard = this.datatableService.save(dashboard);
 		ModelData.listDashboardDTOs = this.datatableService.findAll(new TableParameterDTO(), DashboardDTO.class,
 				connection);
-
-		try {
-			Statement statement = connection.createStatement();
-			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.dashboard_listener + ", 'Dashboard changed';");
-			statement.close();
-		} catch (Exception e) {
-			throw new WebApplicationException(e);
-		}
 		return modelMapper.map(dashboard, DashboardDTO.class);
 
 	}

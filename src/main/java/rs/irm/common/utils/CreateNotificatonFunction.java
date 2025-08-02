@@ -12,25 +12,31 @@ import rs.irm.database.utils.ExecuteMethod;
 
 public class CreateNotificatonFunction implements ExecuteMethod {
 
+	private String functionFile;
+
+	public CreateNotificatonFunction(String functionFile) {
+		this.functionFile = functionFile;
+	}
+
 	@Override
 	public void execute(Connection connection) {
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-				this.getClass().getClassLoader().getResourceAsStream("listeners/notification_listener.sql")));
-		
+				this.getClass().getClassLoader().getResourceAsStream("listeners/" + this.functionFile)));
+
 		String row;
-		String functionString="";
+		String functionString = "";
 		try {
-			while((row=bufferedReader.readLine())!=null) {
-				functionString+=row+"\n";
+			while ((row = bufferedReader.readLine()) != null) {
+				functionString += row + "\n";
 			}
-			
+
 			bufferedReader.close();
 		} catch (IOException e) {
 			throw new WebApplicationException(e);
 		}
-		
+
 		try {
-			Statement statement=connection.createStatement();
+			Statement statement = connection.createStatement();
 			statement.executeUpdate(functionString);
 			statement.close();
 		} catch (SQLException e) {

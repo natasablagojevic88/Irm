@@ -3,7 +3,6 @@ package rs.irm.administration.utils;
 import java.net.HttpURLConnection;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +33,6 @@ import rs.irm.database.utils.IndexData;
 import rs.irm.database.utils.TableData;
 import rs.irm.database.utils.TableFilter;
 import rs.irm.database.utils.UniqueData;
-import rs.irm.utils.DatabaseListenerJob;
 
 public class CreateModel implements ExecuteMethodWithReturn<ModelDTO> {
 
@@ -128,14 +126,6 @@ public class CreateModel implements ExecuteMethodWithReturn<ModelDTO> {
 		if (modelDTO.getParentId() == null) {
 			modelDTO.setParentId(Long.valueOf(-1));
 		}
-		try {
-			Statement statement = connection.createStatement();
-			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.model_listener + ", 'Model changed';");
-			statement.close();
-		} catch (Exception e) {
-			throw new WebApplicationException(e);
-		}
-
 		return modelDTO;
 	}
 

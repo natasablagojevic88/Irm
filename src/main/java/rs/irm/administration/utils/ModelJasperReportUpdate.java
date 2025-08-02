@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
-import java.sql.Statement;
 
 import org.modelmapper.ModelMapper;
 
@@ -26,7 +25,6 @@ import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethodWithReturn;
 import rs.irm.utils.AppParameters;
-import rs.irm.utils.DatabaseListenerJob;
 
 public class ModelJasperReportUpdate implements ExecuteMethodWithReturn<ModelJasperReportDTO> {
 
@@ -82,7 +80,7 @@ public class ModelJasperReportUpdate implements ExecuteMethodWithReturn<ModelJas
 
 			File jasperFolder = new File(AppParameters.jasperfilepath);
 
-			if (!(jasperFolder.exists()&&jasperFolder.isDirectory())) {
+			if (!(jasperFolder.exists() && jasperFolder.isDirectory())) {
 				jasperFolder.mkdirs();
 			}
 			File jasperFile = new File(modelJasperReportDTO.getFilePath());
@@ -95,15 +93,6 @@ public class ModelJasperReportUpdate implements ExecuteMethodWithReturn<ModelJas
 				throw new WebApplicationException(e);
 			}
 		}
-
-		try {
-			Statement statement = connection.createStatement();
-			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.modeljasperreport_listener + ", 'Model jaspoer report changed';");
-			statement.close();
-		} catch (Exception e) {
-			throw new WebApplicationException(e);
-		}
-
 		return modelMapper.map(modelJasperReport, ModelJasperReportDTO.class);
 	}
 

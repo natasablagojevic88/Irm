@@ -45,7 +45,6 @@ import rs.irm.database.utils.ExecuteMethodWithReturn;
 import rs.irm.database.utils.LeftTableData;
 import rs.irm.database.utils.TableFilter;
 import rs.irm.utils.AppParameters;
-import rs.irm.utils.DatabaseListenerJob;
 
 public class UpdateReport implements ExecuteMethodWithReturn<ReportDTO> {
 
@@ -85,13 +84,6 @@ public class UpdateReport implements ExecuteMethodWithReturn<ReportDTO> {
 		}
 
 		ConvertReportToReportDTO convertReportToReportDTO = new ConvertReportToReportDTO(httpServletRequest, report);
-		try {
-			Statement statement = connection.createStatement();
-			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.report_listener + ", 'Report changed';");
-			statement.close();
-		} catch (Exception e) {
-			throw new WebApplicationException(e);
-		}
 
 		return convertReportToReportDTO.execute(connection);
 	}

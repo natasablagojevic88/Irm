@@ -286,44 +286,63 @@ public class AppInitServiceImpl implements AppInitService {
 	}
 
 	@Override
-	public void checkNotificationListener() {
-		String functionString = "";
+	public void initListener() {
 
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-				this.getClass().getClassLoader().getResourceAsStream("listeners/notification_listener.sql")));
+		String[] functionsFiles = new String[] { "notification_listener.sql", "model_listener.sql",
+				"modelcolumn_listener.sql", "modeljasperreport_listener.sql", "reportgrouprole_listener.sql",
+				"report_listener.sql", "dashboard_listener.sql", "dashboardrole_listener.sql", "reportjob_listener.sql",
+				"modelprocedure_listener.sql" };
 
-		String row;
+		String[] tables = new String[] { "notification", "model", "modelcolumn", "modeljasperreport",
+				"reportgroup_role", "report", "dashboard", "dashboard_role", "reportjob", "modelprocedure" };
 
-		try {
-			while ((row = bufferedReader.readLine()) != null) {
-				functionString += row + "\n";
+		String[] triggers = new String[] { "listener_notification", "listener_model", "listener_modelcolumn",
+				"listener_modeljasperreport", "listener_reportgrouprole", "listener_report", "listener_dashboard",
+				"listener_dashboardrole", "listener_reportjob", "listener_modelprocedure" };
+
+		int index = -1;
+		for (String functionFile : functionsFiles) {
+			index++;
+
+			String functionString = "";
+
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+					this.getClass().getClassLoader().getResourceAsStream("listeners/" + functionFile)));
+
+			String row;
+
+			try {
+				while ((row = bufferedReader.readLine()) != null) {
+					functionString += row + "\n";
+				}
+
+				bufferedReader.close();
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+				throw new WebApplicationException(e);
 			}
 
-			bufferedReader.close();
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-			throw new WebApplicationException(e);
-		}
+			ReadNotificationFunction readNotificationFunction = new ReadNotificationFunction(triggers[index]);
+			String function = this.datatableService.executeMethodWithReturn(readNotificationFunction);
 
-		ReadNotificationFunction readNotificationFunction = new ReadNotificationFunction();
-		String function = this.datatableService.executeMethodWithReturn(readNotificationFunction);
-
-		if (function == null) {
-			CreateNotificatonFunction createNotificationFunction = new CreateNotificatonFunction();
-			this.datatableService.executeMethod(createNotificationFunction);
-		} else {
-			if (!function.equals(functionString.split("\\$function\\$")[1])) {
-				CreateNotificatonFunction createNotificationFunction = new CreateNotificatonFunction();
+			if (function == null) {
+				CreateNotificatonFunction createNotificationFunction = new CreateNotificatonFunction(functionFile);
 				this.datatableService.executeMethod(createNotificationFunction);
+			} else {
+				if (!function.equals(functionString.split("\\$function\\$")[1])) {
+					CreateNotificatonFunction createNotificationFunction = new CreateNotificatonFunction(functionFile);
+					this.datatableService.executeMethod(createNotificationFunction);
+				}
 			}
-		}
-		
-		CheckNotificationTrigger checkTrigger=new CheckNotificationTrigger();
-		Long count=this.datatableService.executeMethodWithReturn(checkTrigger);
-		
-		if(count.doubleValue()==0) {
-			CreateNotificationListenerTrigger createNotificationListenerTrigger=new CreateNotificationListenerTrigger();
-			this.datatableService.executeMethod(createNotificationListenerTrigger);
+
+			CheckNotificationTrigger checkTrigger = new CheckNotificationTrigger(tables[index], triggers[index]);
+			Long count = this.datatableService.executeMethodWithReturn(checkTrigger);
+
+			if (count.doubleValue() == 0) {
+				CreateNotificationListenerTrigger createNotificationListenerTrigger = new CreateNotificationListenerTrigger(
+						tables[index], triggers[index]);
+				this.datatableService.executeMethod(createNotificationListenerTrigger);
+			}
 		}
 
 	}

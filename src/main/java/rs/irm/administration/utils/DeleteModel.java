@@ -10,7 +10,6 @@ import rs.irm.administration.enums.ModelType;
 import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethod;
-import rs.irm.utils.DatabaseListenerJob;
 
 public class DeleteModel implements ExecuteMethod {
 
@@ -41,14 +40,6 @@ public class DeleteModel implements ExecuteMethod {
 					statement.executeUpdate(deleteTableQuary);
 					statement.close();
 				}
-			}
-
-			try {
-				Statement statement=connection.createStatement();
-				statement.executeUpdate("NOTIFY "+DatabaseListenerJob.model_listener+", 'Model changed';");
-				statement.close();
-			}catch (Exception e) {
-				throw new WebApplicationException(e);
 			}
 		} catch (Exception e) {
 			throw new WebApplicationException(e);
