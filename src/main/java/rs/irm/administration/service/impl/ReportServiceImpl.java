@@ -28,6 +28,7 @@ import rs.irm.administration.service.ReportService;
 import rs.irm.administration.utils.ConvertReportToReportDTO;
 import rs.irm.administration.utils.DeleteReportJob;
 import rs.irm.administration.utils.ModelData;
+import rs.irm.administration.utils.ReportDelete;
 import rs.irm.administration.utils.UpdateReport;
 import rs.irm.administration.utils.UpdateReportJob;
 import rs.irm.common.dto.ComboboxDTO;
@@ -353,9 +354,9 @@ public class ReportServiceImpl implements ReportService {
 
 	@Override
 	public void getDelete(Long id) {
-		Report report = this.datatableService.findByExistingId(id, Report.class);
-		this.datatableService.delete(report);
-		ModelData.listReportDTOs = this.datatableService.findAll(new TableParameterDTO(), ReportDTO.class);
+
+		ReportDelete delete = new ReportDelete(id, httpServletRequest);
+		this.datatableService.executeMethod(delete);
 	}
 
 	@Override

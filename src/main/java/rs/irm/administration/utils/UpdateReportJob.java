@@ -1,10 +1,12 @@
 package rs.irm.administration.utils;
 
 import java.sql.Connection;
+import java.sql.Statement;
 
 import org.modelmapper.ModelMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.dto.ReportJobDTO;
 import rs.irm.administration.entity.ReportJob;
 import rs.irm.administration.enums.ReportJobFileType;
@@ -15,10 +17,10 @@ import rs.irm.administration.service.impl.LoadReportJobServiceImpl;
 import rs.irm.common.exceptions.FieldRequiredException;
 import rs.irm.common.service.CommonService;
 import rs.irm.common.service.impl.CommonServiceImpl;
-import rs.irm.database.dto.TableParameterDTO;
 import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethodWithReturn;
+import rs.irm.utils.DatabaseListenerJob;
 
 public class UpdateReportJob implements ExecuteMethodWithReturn<ReportJobDTO> {
 	private HttpServletRequest httpServletRequest;
@@ -137,8 +139,13 @@ public class UpdateReportJob implements ExecuteMethodWithReturn<ReportJobDTO> {
 
 		reportJob = this.datatableService.save(reportJob, connection);
 		this.loadReportJobService.loadJob(reportJob);
-		ModelData.listReportJobDTOs = this.datatableService.findAll(new TableParameterDTO(), ReportJobDTO.class,
-				connection);
+		try {
+			Statement statement = connection.createStatement();
+			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.reportjob_listener + ", 'Report job changed';");
+			statement.close();
+		} catch (Exception e) {
+			throw new WebApplicationException(e);
+		}
 
 		return modelMapper.map(reportJob, ReportJobDTO.class);
 	}

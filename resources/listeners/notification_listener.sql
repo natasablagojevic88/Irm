@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION notification_listen()
+CREATE OR REPLACE FUNCTION listener_notification()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$

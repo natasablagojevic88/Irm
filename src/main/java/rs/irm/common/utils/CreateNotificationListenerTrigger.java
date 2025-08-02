@@ -14,7 +14,7 @@ public class CreateNotificationListenerTrigger implements ExecuteMethod{
 			+ "    or\n"
 			+ "update\n"
 			+ "    on\n"
-			+ "notification for each row execute function notification_listen()";
+			+ "notification for each row execute function listener_notification()";
 
 	@Override
 	public void execute(Connection connection) {

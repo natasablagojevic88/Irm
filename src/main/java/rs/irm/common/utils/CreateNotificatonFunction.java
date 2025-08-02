@@ -15,7 +15,7 @@ public class CreateNotificatonFunction implements ExecuteMethod {
 	@Override
 	public void execute(Connection connection) {
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-				this.getClass().getClassLoader().getResourceAsStream("notification_listener.sql")));
+				this.getClass().getClassLoader().getResourceAsStream("listeners/notification_listener.sql")));
 		
 		String row;
 		String functionString="";

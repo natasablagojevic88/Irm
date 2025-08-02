@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +29,6 @@ import rs.irm.administration.dto.RoleDTO;
 import rs.irm.administration.entity.Model;
 import rs.irm.administration.entity.ModelColumn;
 import rs.irm.administration.entity.ModelJasperReport;
-import rs.irm.administration.entity.ModelProcedure;
 import rs.irm.administration.enums.ModelType;
 import rs.irm.administration.service.ModelService;
 import rs.irm.administration.utils.CreateModel;
@@ -42,9 +39,10 @@ import rs.irm.administration.utils.DeleteTrigger;
 import rs.irm.administration.utils.FindColumns;
 import rs.irm.administration.utils.FindFunctions;
 import rs.irm.administration.utils.FindProcedures;
-import rs.irm.administration.utils.ModelData;
 import rs.irm.administration.utils.ModelJasperReportDelete;
 import rs.irm.administration.utils.ModelJasperReportUpdate;
+import rs.irm.administration.utils.ModelProcedureDelete;
+import rs.irm.administration.utils.ModelProcedureUpdate;
 import rs.irm.administration.utils.RefreshModel;
 import rs.irm.administration.utils.UpdateTrigger;
 import rs.irm.common.dto.ComboboxDTO;
@@ -399,20 +397,14 @@ public class ModelServiceImpl implements ModelService {
 
 	@Override
 	public ModelProcedureDTO getUpdateProcedure(ModelProcedureDTO modelProcedureDTO) {
-		ModelProcedure modelProcedure = modelProcedureDTO.getId() == 0 ? new ModelProcedure()
-				: this.datatableService.findByExistingId(modelProcedureDTO.getId(), ModelProcedure.class);
-		
-		new ModelMapper().map(modelProcedureDTO, modelProcedure);
-		modelProcedure=this.datatableService.save(modelProcedure);
-		ModelData.modelProcedureDTOs=this.datatableService.findAll(new TableParameterDTO(), ModelProcedureDTO.class);
-		return new ModelMapper().map(modelProcedure, ModelProcedureDTO.class);
+		ModelProcedureUpdate modelProcedureUpdate=new ModelProcedureUpdate(modelProcedureDTO, request);
+		return this.datatableService.executeMethodWithReturn(modelProcedureUpdate);
 	}
 
 	@Override
 	public void getProcedureDelete(Long id) {
-		ModelProcedure modelProcedure = this.datatableService.findByExistingId(id,ModelProcedure.class);
-		this.datatableService.delete(modelProcedure);
-		ModelData.modelProcedureDTOs=this.datatableService.findAll(new TableParameterDTO(), ModelProcedureDTO.class);
+		ModelProcedureDelete modelProcedureDelete=new ModelProcedureDelete(id, this.request);
+		this.datatableService.executeMethod(modelProcedureDelete);
 	}
 
 }

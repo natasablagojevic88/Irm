@@ -290,7 +290,7 @@ public class AppInitServiceImpl implements AppInitService {
 		String functionString = "";
 
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-				this.getClass().getClassLoader().getResourceAsStream("notification_listener.sql")));
+				this.getClass().getClassLoader().getResourceAsStream("listeners/notification_listener.sql")));
 
 		String row;
 

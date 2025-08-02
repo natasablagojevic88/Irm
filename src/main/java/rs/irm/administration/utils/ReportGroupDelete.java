@@ -5,37 +5,34 @@ import java.sql.Statement;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.WebApplicationException;
-import rs.irm.administration.entity.ReportJob;
-import rs.irm.administration.service.LoadReportJobService;
-import rs.irm.administration.service.impl.LoadReportJobServiceImpl;
+import rs.irm.administration.entity.ReportGroup;
 import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethod;
 import rs.irm.utils.DatabaseListenerJob;
 
-public class DeleteReportJob implements ExecuteMethod {
+public class ReportGroupDelete implements ExecuteMethod {
 
 	private HttpServletRequest httpServletRequest;
 	private Long id;
-
 	private DatatableService datatableService;
-	private LoadReportJobService loadReportJobService;
 
-	public DeleteReportJob(HttpServletRequest httpServletRequest, Long id) {
+	public ReportGroupDelete(HttpServletRequest httpServletRequest, Long id) {
 		this.httpServletRequest = httpServletRequest;
 		this.id = id;
 		this.datatableService = new DatatableServiceImpl(this.httpServletRequest);
-		this.loadReportJobService = new LoadReportJobServiceImpl();
 	}
 
 	@Override
 	public void execute(Connection connection) {
-		ReportJob reportJob = this.datatableService.findByExistingId(id, ReportJob.class, connection);
-		this.datatableService.delete(reportJob, connection);
-		this.loadReportJobService.removeJob(reportJob);
+		ReportGroup reportGroup = this.datatableService.findByExistingId(id, ReportGroup.class, connection);
+		this.datatableService.delete(reportGroup, connection);
+
 		try {
 			Statement statement = connection.createStatement();
-			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.reportjob_listener + ", 'Report job changed';");
+			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.reportgroup_listener + ", 'Report group changed';");
+			statement.executeUpdate(
+					"NOTIFY " + DatabaseListenerJob.reportgrouprole_listener + ", 'Report group role changed';");
 			statement.close();
 		} catch (Exception e) {
 			throw new WebApplicationException(e);
