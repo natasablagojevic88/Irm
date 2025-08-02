@@ -4,12 +4,11 @@ import java.sql.Statement;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.WebApplicationException;
-import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.entity.ModelColumn;
-import rs.irm.database.dto.TableParameterDTO;
 import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethod;
+import rs.irm.utils.DatabaseListenerJob;
 
 public class DeleteModelColumn implements ExecuteMethod{
 	
@@ -46,8 +45,13 @@ public class DeleteModelColumn implements ExecuteMethod{
 			throw new WebApplicationException(e);
 		}
 		
-		ModelData.listColumnDTOs = this.datatableService.findAll(new TableParameterDTO(), ModelColumnDTO.class,
-				connection);
+		try {
+			Statement statement = connection.createStatement();
+			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.modelcolumn_listener + ", 'Model column changed';");
+			statement.close();
+		} catch (Exception e) {
+			throw new WebApplicationException(e);
+		}
 	}
 
 }

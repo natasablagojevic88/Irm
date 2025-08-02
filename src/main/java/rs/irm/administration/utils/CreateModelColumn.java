@@ -3,6 +3,7 @@ package rs.irm.administration.utils;
 import java.net.HttpURLConnection;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Statement;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ import rs.irm.database.utils.CreateTableData;
 import rs.irm.database.utils.ExecuteMethodWithReturn;
 import rs.irm.database.utils.ForeignKeyData;
 import rs.irm.database.utils.TableFilter;
+import rs.irm.utils.DatabaseListenerJob;
 
 public class CreateModelColumn implements ExecuteMethodWithReturn<ModelColumnDTO> {
 
@@ -139,8 +141,13 @@ public class CreateModelColumn implements ExecuteMethodWithReturn<ModelColumnDTO
 		} catch (Exception e) {
 			throw new WebApplicationException(e);
 		}
-		ModelData.listColumnDTOs = this.datatableService.findAll(new TableParameterDTO(), ModelColumnDTO.class,
-				connection);
+		try {
+			Statement statement = connection.createStatement();
+			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.modelcolumn_listener + ", 'Model column changed';");
+			statement.close();
+		} catch (Exception e) {
+			throw new WebApplicationException(e);
+		}
 		return modelMapper.map(modelColumn, ModelColumnDTO.class);
 	}
 

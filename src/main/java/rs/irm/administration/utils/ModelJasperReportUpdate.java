@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
+import java.sql.Statement;
 
 import org.modelmapper.ModelMapper;
 
@@ -21,11 +22,11 @@ import rs.irm.common.exceptions.CommonException;
 import rs.irm.common.exceptions.FieldRequiredException;
 import rs.irm.common.service.CommonService;
 import rs.irm.common.service.impl.CommonServiceImpl;
-import rs.irm.database.dto.TableParameterDTO;
 import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethodWithReturn;
 import rs.irm.utils.AppParameters;
+import rs.irm.utils.DatabaseListenerJob;
 
 public class ModelJasperReportUpdate implements ExecuteMethodWithReturn<ModelJasperReportDTO> {
 
@@ -95,8 +96,13 @@ public class ModelJasperReportUpdate implements ExecuteMethodWithReturn<ModelJas
 			}
 		}
 
-		ModelData.listModelJasperReportDTOs = this.datatableService.findAll(new TableParameterDTO(),
-				ModelJasperReportDTO.class, connection);
+		try {
+			Statement statement = connection.createStatement();
+			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.modeljasperreport_listener + ", 'Model jaspoer report changed';");
+			statement.close();
+		} catch (Exception e) {
+			throw new WebApplicationException(e);
+		}
 
 		return modelMapper.map(modelJasperReport, ModelJasperReportDTO.class);
 	}

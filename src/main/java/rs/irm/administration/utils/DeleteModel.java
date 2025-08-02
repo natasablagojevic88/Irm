@@ -5,13 +5,12 @@ import java.sql.Statement;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.WebApplicationException;
-import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.entity.Model;
 import rs.irm.administration.enums.ModelType;
-import rs.irm.database.dto.TableParameterDTO;
 import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethod;
+import rs.irm.utils.DatabaseListenerJob;
 
 public class DeleteModel implements ExecuteMethod {
 
@@ -44,8 +43,13 @@ public class DeleteModel implements ExecuteMethod {
 				}
 			}
 
-			ModelData.listModelDTOs = this.datatableService.findAll(new TableParameterDTO(), ModelDTO.class,
-					connection);
+			try {
+				Statement statement=connection.createStatement();
+				statement.executeUpdate("NOTIFY "+DatabaseListenerJob.model_listener+", 'Model changed';");
+				statement.close();
+			}catch (Exception e) {
+				throw new WebApplicationException(e);
+			}
 		} catch (Exception e) {
 			throw new WebApplicationException(e);
 		}

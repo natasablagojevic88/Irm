@@ -3,6 +3,7 @@ package rs.irm.administration.utils;
 import java.net.HttpURLConnection;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,7 @@ import rs.irm.database.utils.IndexData;
 import rs.irm.database.utils.TableData;
 import rs.irm.database.utils.TableFilter;
 import rs.irm.database.utils.UniqueData;
+import rs.irm.utils.DatabaseListenerJob;
 
 public class CreateModel implements ExecuteMethodWithReturn<ModelDTO> {
 
@@ -63,7 +65,7 @@ public class CreateModel implements ExecuteMethodWithReturn<ModelDTO> {
 			if (modelDTO.getColumnsNumber() == null) {
 				throw new FieldRequiredException("ModelDTO.columnsNumber");
 			}
-			
+
 			if (modelDTO.getTableWidth() == null) {
 				throw new FieldRequiredException("ModelDTO.tableWidth");
 			}
@@ -72,18 +74,20 @@ public class CreateModel implements ExecuteMethodWithReturn<ModelDTO> {
 			modelDTO.setColumnsNumber(null);
 			modelDTO.setTableWidth(null);
 		}
-		
-		TableParameterDTO tableParameterDTOForColumn=new TableParameterDTO();
-		TableFilter tableFilter=new TableFilter();
+
+		TableParameterDTO tableParameterDTOForColumn = new TableParameterDTO();
+		TableFilter tableFilter = new TableFilter();
 		tableFilter.setField("modelId");
 		tableFilter.setSearchOperation(SearchOperation.equals);
 		tableFilter.setParameter1(String.valueOf(modelDTO.getId()));
 		tableParameterDTOForColumn.getTableFilters().add(tableFilter);
-		List<ModelColumnDTO> modelColumnDTOs=this.datatableService.findAll(tableParameterDTOForColumn, ModelColumnDTO.class, connection);
+		List<ModelColumnDTO> modelColumnDTOs = this.datatableService.findAll(tableParameterDTOForColumn,
+				ModelColumnDTO.class, connection);
 
-		for(ModelColumnDTO modelColumnDTO:modelColumnDTOs) {
-			if((modelColumnDTO.getColumnNumber()+modelColumnDTO.getColspan()-1)>modelDTO.getColumnsNumber()) {
-				throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "wrongNumberOfColumns", modelColumnDTO.getName());
+		for (ModelColumnDTO modelColumnDTO : modelColumnDTOs) {
+			if ((modelColumnDTO.getColumnNumber() + modelColumnDTO.getColspan() - 1) > modelDTO.getColumnsNumber()) {
+				throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "wrongNumberOfColumns",
+						modelColumnDTO.getName());
 			}
 		}
 
@@ -124,14 +128,19 @@ public class CreateModel implements ExecuteMethodWithReturn<ModelDTO> {
 		if (modelDTO.getParentId() == null) {
 			modelDTO.setParentId(Long.valueOf(-1));
 		}
-
-		ModelData.listModelDTOs = this.datatableService.findAll(new TableParameterDTO(), ModelDTO.class, connection);
+		try {
+			Statement statement = connection.createStatement();
+			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.model_listener + ", 'Model changed';");
+			statement.close();
+		} catch (Exception e) {
+			throw new WebApplicationException(e);
+		}
 
 		return modelDTO;
 	}
-	
+
 	private ModelMapper customModelMapper() {
-		ModelMapper modelMapper=new ModelMapper();
+		ModelMapper modelMapper = new ModelMapper();
 		modelMapper.addMappings(new PropertyMap<ModelDTO, Model>() {
 
 			@Override
@@ -141,10 +150,10 @@ public class CreateModel implements ExecuteMethodWithReturn<ModelDTO> {
 				skip(destination.getUnlockRole());
 				skip(destination.getUpdateRole());
 				skip(destination.getLockRole());
-				
+
 			}
 		});
-		
+
 		return modelMapper;
 	}
 

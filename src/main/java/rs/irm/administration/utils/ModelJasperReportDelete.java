@@ -1,14 +1,15 @@
 package rs.irm.administration.utils;
 
 import java.sql.Connection;
+import java.sql.Statement;
 
 import jakarta.servlet.http.HttpServletRequest;
-import rs.irm.administration.dto.ModelJasperReportDTO;
+import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.entity.ModelJasperReport;
-import rs.irm.database.dto.TableParameterDTO;
 import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethod;
+import rs.irm.utils.DatabaseListenerJob;
 
 public class ModelJasperReportDelete implements ExecuteMethod {
 
@@ -27,7 +28,13 @@ public class ModelJasperReportDelete implements ExecuteMethod {
 		ModelJasperReport modelJasperReport=this.datatableService.findByExistingId(id, ModelJasperReport.class,connection);
 		this.datatableService.delete(modelJasperReport,connection);
 
-		ModelData.listModelJasperReportDTOs=this.datatableService.findAll(new TableParameterDTO(), ModelJasperReportDTO.class, connection);
+		try {
+			Statement statement = connection.createStatement();
+			statement.executeUpdate("NOTIFY " + DatabaseListenerJob.modeljasperreport_listener + ", 'Model jaspoer report changed';");
+			statement.close();
+		} catch (Exception e) {
+			throw new WebApplicationException(e);
+		}
 	}
 
 }

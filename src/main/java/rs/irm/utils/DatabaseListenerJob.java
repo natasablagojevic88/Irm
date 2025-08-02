@@ -18,12 +18,24 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import rs.irm.administration.dto.ModelColumnDTO;
+import rs.irm.administration.dto.ModelDTO;
+import rs.irm.administration.dto.ModelJasperReportDTO;
+import rs.irm.administration.utils.ModelData;
+import rs.irm.database.dto.TableParameterDTO;
+import rs.irm.database.service.DatatableService;
+import rs.irm.database.service.impl.DatatableServiceImpl;
+
 public class DatabaseListenerJob implements Job {
 	Logger logger = LogManager.getLogger(DatabaseListenerJob.class);
 
 	final String notificationListener = "notification_listen";
-	public static String model_listener = "model_listen";
+	public final static String model_listener = "model_listen";
+	public final static String modelcolumn_listener = "modelcolumn_listen";
+	public final static String modeljasperreport_listener = "modeljasperreport_listen";
 	ExecutorService websocketSender = Executors.newFixedThreadPool(10);
+	
+	DatatableService datatableService=new DatatableServiceImpl();
 
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
@@ -40,6 +52,9 @@ public class DatabaseListenerJob implements Job {
 
 				Statement statement = AppConnections.datatabeListener.createStatement();
 				statement.execute("LISTEN " + notificationListener);
+				statement.execute("LISTEN " + model_listener);
+				statement.execute("LISTEN " + modelcolumn_listener);
+				statement.execute("LISTEN " + modeljasperreport_listener);
 				statement.close();
 			}
 			PGConnection pgConnection = AppConnections.datatabeListener.unwrap(PGConnection.class);
@@ -47,14 +62,35 @@ public class DatabaseListenerJob implements Job {
 			PGNotification[] notifications = pgConnection.getNotifications();
 			if (notifications != null) {
 				for (PGNotification notification : notifications) {
-					JSONObject jsonObject = (JSONObject) new JSONParser().parse(notification.getParameter());
+					String listener=notification.getName();
 					
-					Long userid=((Number) jsonObject.get("userid")).longValue();
-					Long count=((Number) jsonObject.get("count")).longValue();
+					switch(listener) {
+					case notificationListener:{
+						JSONObject jsonObject = (JSONObject) new JSONParser().parse(notification.getParameter());
+						
+						Long userid=((Number) jsonObject.get("userid")).longValue();
+						Long count=((Number) jsonObject.get("count")).longValue();
 
-					websocketSender.submit(()->{
-						new NotificationSocket().sendMessage(userid, count);
-					});
+						websocketSender.submit(()->{
+							new NotificationSocket().sendMessage(userid, count);
+						});
+						break;
+					}
+					case model_listener:{
+						ModelData.listModelDTOs = this.datatableService.findAll(new TableParameterDTO(), ModelDTO.class);
+						break;
+					}
+					case modelcolumn_listener:{
+						ModelData.listColumnDTOs = this.datatableService.findAll(new TableParameterDTO(), ModelColumnDTO.class);
+						break;
+					}
+					case modeljasperreport_listener:{
+						ModelData.listModelJasperReportDTOs = this.datatableService.findAll(new TableParameterDTO(),
+								ModelJasperReportDTO.class);
+						break;
+					}
+					}
+					
 				}
 			}
 		} catch (Exception e) {
