@@ -22,9 +22,9 @@ public class CustomServletContextListener implements ServletContextListener {
 		appInitService.initParameters();
 		appInitService.initConnections();
 		appInitService.createTables();
+		appInitService.loadModel();
 		appInitService.initListener();
 		appInitService.loadIcons();
-		appInitService.loadModel();
 		appInitService.checkAdmin();
 		appInitService.initQuart();
 		appInitService.initJasperReports();

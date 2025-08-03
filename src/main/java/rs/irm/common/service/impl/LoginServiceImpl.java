@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Context;
 import rs.irm.administration.entity.AppUser;
+import rs.irm.administration.utils.ModelData;
 import rs.irm.common.dto.ComboboxDTO;
 import rs.irm.common.dto.LoginDTO;
 import rs.irm.common.entity.TokenDatabase;
@@ -44,7 +45,7 @@ public class LoginServiceImpl implements LoginService {
 
 	@Context
 	private HttpServletRequest servletRequest;
-	
+
 	@Inject
 	private CommonService commonService;
 
@@ -77,10 +78,18 @@ public class LoginServiceImpl implements LoginService {
 			throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "wrongPassword", null);
 		}
 
-		TokenDatabase tokenDatabase=insertTokenToBase(0L, appUser, true);
-		servletResponse.addCookie(createCookie("session", tokenDatabase.getSessionToken(), AppParameters.refreshtokenduration.intValue()*60));
-		servletResponse.addCookie(createCookie("refresh_token", tokenDatabase.getRefreshToken(), AppParameters.refreshtokenduration.intValue()*60));
-		servletResponse.addCookie(createCookie("lang", loginDTO.getLanguage().name(), AppParameters.refreshtokenduration.intValue()*60));
+		TokenDatabase tokenDatabase = insertTokenToBase(0L, appUser, true);
+		servletResponse.addCookie(createCookie("session", tokenDatabase.getSessionToken(),
+				AppParameters.refreshtokenduration.intValue() * 60));
+		servletResponse.addCookie(createCookie("refresh_token", tokenDatabase.getRefreshToken(),
+				AppParameters.refreshtokenduration.intValue() * 60));
+		servletResponse.addCookie(createCookie("lang", loginDTO.getLanguage().name(),
+				AppParameters.refreshtokenduration.intValue() * 60));
+
+		if (ModelData.datatableTokens.stream()
+				.filter(a -> a.getId().doubleValue() == tokenDatabase.getId().doubleValue()).toList().isEmpty()) {
+			ModelData.datatableTokens.add(tokenDatabase);
+		}
 	}
 
 	@Override
@@ -110,13 +119,13 @@ public class LoginServiceImpl implements LoginService {
 
 	@Override
 	public void logout() {
-		
+
 		TableParameterDTO tableParameterDTO = new TableParameterDTO();
-		tableParameterDTO.getTableFilters().add(new TableFilter("sessionToken", SearchOperation.equals, commonService.getSession(), null));
-		List<TokenDatabase> tokenDatabaseDTOs = this.datatableService.findAll(tableParameterDTO,
-				TokenDatabase.class);
-		
-		TokenDatabase tokenDatabaseDTO=tokenDatabaseDTOs.get(0);
+		tableParameterDTO.getTableFilters()
+				.add(new TableFilter("sessionToken", SearchOperation.equals, commonService.getSession(), null));
+		List<TokenDatabase> tokenDatabaseDTOs = this.datatableService.findAll(tableParameterDTO, TokenDatabase.class);
+
+		TokenDatabase tokenDatabaseDTO = tokenDatabaseDTOs.get(0);
 		this.insertTokenToBase(tokenDatabaseDTO.getId(), tokenDatabaseDTO.getAppUser(), false);
 
 		servletResponse.addCookie(createCookie("session", null, 0));
@@ -124,18 +133,19 @@ public class LoginServiceImpl implements LoginService {
 		servletResponse.addCookie(createCookie("lang", null, 0));
 
 	}
-	
+
 	@Override
-	public Cookie createCookie(String name,String value, Integer duration) {
+	public Cookie createCookie(String name, String value, Integer duration) {
 		Cookie cookie = new Cookie(name, value);
-		cookie.setHttpOnly(name.equals("lang")?false:true);
+		cookie.setHttpOnly(name.equals("lang") ? false : true);
 		cookie.setSecure(true);
 		cookie.setMaxAge(duration);
-		cookie.setPath(AppInitServiceImpl.contextPath==null?"/":AppInitServiceImpl.contextPath.length()==0?"/":AppInitServiceImpl.contextPath);
+		cookie.setPath(AppInitServiceImpl.contextPath == null ? "/"
+				: AppInitServiceImpl.contextPath.length() == 0 ? "/" : AppInitServiceImpl.contextPath);
 		cookie.setAttribute("SameSite", "Strict");
 		return cookie;
 	}
-	
+
 	@Override
 	public String generateOpaqueToken() {
 		SecureRandom random = new SecureRandom();
@@ -144,11 +154,11 @@ public class LoginServiceImpl implements LoginService {
 		String token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
 		return token;
 	}
-	
+
 	@Override
-	public TokenDatabase insertTokenToBase(Long id, AppUser appUser,Boolean active) {
-		LocalDateTime currentTime=LocalDateTime.now();
-		TokenDatabase tokenDatabase=new TokenDatabase();
+	public TokenDatabase insertTokenToBase(Long id, AppUser appUser, Boolean active) {
+		LocalDateTime currentTime = LocalDateTime.now();
+		TokenDatabase tokenDatabase = new TokenDatabase();
 		tokenDatabase.setId(id);
 		tokenDatabase.setActive(active);
 		tokenDatabase.setAppUser(appUser);
@@ -156,8 +166,8 @@ public class LoginServiceImpl implements LoginService {
 		tokenDatabase.setRefreshEnd(currentTime.plusMinutes(AppParameters.refreshtokenduration));
 		tokenDatabase.setSessionToken(generateOpaqueToken());
 		tokenDatabase.setSessionEnd(currentTime.plusMinutes(AppParameters.sessionduration));
-		tokenDatabase=this.datatableService.save(tokenDatabase);
+		tokenDatabase = this.datatableService.save(tokenDatabase);
 		return tokenDatabase;
 	}
-	
+
 }

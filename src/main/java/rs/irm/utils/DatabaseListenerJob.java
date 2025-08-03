@@ -1,6 +1,8 @@
 package rs.irm.utils;
 
+import java.lang.reflect.Field;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,6 +20,10 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.dto.DashboardDTO;
 import rs.irm.administration.dto.DashboardRoleInfoDTO;
 import rs.irm.administration.dto.ModelColumnDTO;
@@ -28,7 +34,13 @@ import rs.irm.administration.dto.ReportDTO;
 import rs.irm.administration.dto.ReportGroupDTO;
 import rs.irm.administration.dto.ReportGroupRolesDTO;
 import rs.irm.administration.dto.ReportJobDTO;
+import rs.irm.administration.entity.AppUser;
+import rs.irm.administration.entity.AppUserRole;
+import rs.irm.administration.entity.Role;
 import rs.irm.administration.utils.ModelData;
+import rs.irm.common.entity.TokenDatabase;
+import rs.irm.common.service.CommonService;
+import rs.irm.common.service.impl.CommonServiceImpl;
 import rs.irm.database.dto.TableParameterDTO;
 import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
@@ -47,9 +59,14 @@ public class DatabaseListenerJob implements Job {
 	public final static String dashboardrole_listener = "dashboardrole_listener";
 	public final static String reportjob_listener = "reportjob_listener";
 	public final static String modelprocedure_listener = "modelprocedure_listener";
+	public final static String tokendatatable_listener = "tokendatatable_listen";
+	public final static String appuser_listener = "appuser_listen";
+	public final static String role_listener = "role_listen";
+	public final static String appuserrole_listener = "appuserrole_listen";
 	ExecutorService websocketSender = Executors.newFixedThreadPool(10);
 
 	DatatableService datatableService = new DatatableServiceImpl();
+	CommonService commonService = new CommonServiceImpl();
 
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
@@ -76,6 +93,10 @@ public class DatabaseListenerJob implements Job {
 				statement.execute("LISTEN " + dashboardrole_listener);
 				statement.execute("LISTEN " + reportjob_listener);
 				statement.execute("LISTEN " + modelprocedure_listener);
+				statement.execute("LISTEN " + tokendatatable_listener);
+				statement.execute("LISTEN " + appuser_listener);
+				statement.execute("LISTEN " + role_listener);
+				statement.execute("LISTEN " + appuserrole_listener);
 				statement.close();
 			}
 			PGConnection pgConnection = AppConnections.datatabeListener.unwrap(PGConnection.class);
@@ -147,6 +168,106 @@ public class DatabaseListenerJob implements Job {
 								ModelProcedureDTO.class);
 						break;
 					}
+					case tokendatatable_listener: {
+						JSONObject jsonObject = (JSONObject) new JSONParser().parse(notification.getParameter());
+						Long id = ((Number) jsonObject.get("id")).longValue();
+						if (jsonObject.get("action").equals("DELETE")) {
+							TokenDatabase tokenDatatable = ModelData.datatableTokens.stream()
+									.filter(a -> a.getId().doubleValue() == id.doubleValue()).findFirst().orElse(null);
+							if (tokenDatatable != null) {
+								ModelData.datatableTokens.remove(tokenDatatable);
+							}
+						} else {
+							TokenDatabase tokenDatatable = jsonToObject(jsonObject, TokenDatabase.class);
+
+							if (ModelData.datatableTokens.stream()
+									.filter(a -> a.getId().doubleValue() == id.doubleValue()).toList().isEmpty()) {
+								ModelData.datatableTokens.add(tokenDatatable);
+							} else {
+								TokenDatabase tokenDatatableCurrent = ModelData.datatableTokens.stream()
+										.filter(a -> a.getId().doubleValue() == id.doubleValue()).toList().get(0);
+								int index = ModelData.datatableTokens.indexOf(tokenDatatableCurrent);
+								ModelData.datatableTokens.set(index, tokenDatatable);
+
+							}
+						}
+						break;
+					}
+					case appuser_listener: {
+						JSONObject jsonObject = (JSONObject) new JSONParser().parse(notification.getParameter());
+						Long id = ((Number) jsonObject.get("id")).longValue();
+						if (jsonObject.get("action").equals("DELETE")) {
+							AppUser appUser = ModelData.appUsers.stream()
+									.filter(a -> a.getId().doubleValue() == id.doubleValue()).findFirst().orElse(null);
+							if (appUser != null) {
+								ModelData.appUsers.remove(appUser);
+							}
+						} else {
+							AppUser appUser = jsonToObject(jsonObject, AppUser.class);
+
+							if (ModelData.appUsers.stream().filter(a -> a.getId().doubleValue() == id.doubleValue())
+									.toList().isEmpty()) {
+								ModelData.appUsers.add(appUser);
+							} else {
+								AppUser appUserCurrent = ModelData.appUsers.stream()
+										.filter(a -> a.getId().doubleValue() == id.doubleValue()).toList().get(0);
+								int index = ModelData.appUsers.indexOf(appUserCurrent);
+								ModelData.appUsers.set(index, appUser);
+
+							}
+						}
+						break;
+					}
+					case role_listener: {
+						JSONObject jsonObject = (JSONObject) new JSONParser().parse(notification.getParameter());
+						Long id = ((Number) jsonObject.get("id")).longValue();
+						if (jsonObject.get("action").equals("DELETE")) {
+							Role role = ModelData.roles.stream()
+									.filter(a -> a.getId().doubleValue() == id.doubleValue()).findFirst().orElse(null);
+							if (role != null) {
+								ModelData.roles.remove(role);
+							}
+						} else {
+							Role role = jsonToObject(jsonObject, Role.class);
+
+							if (ModelData.roles.stream().filter(a -> a.getId().doubleValue() == id.doubleValue())
+									.toList().isEmpty()) {
+								ModelData.roles.add(role);
+							} else {
+								Role roleCurrent = ModelData.roles.stream()
+										.filter(a -> a.getId().doubleValue() == id.doubleValue()).toList().get(0);
+								int index = ModelData.roles.indexOf(roleCurrent);
+								ModelData.roles.set(index, role);
+
+							}
+						}
+						break;
+					}
+					case appuserrole_listener: {
+						JSONObject jsonObject = (JSONObject) new JSONParser().parse(notification.getParameter());
+						Long id = ((Number) jsonObject.get("id")).longValue();
+						if (jsonObject.get("action").equals("DELETE")) {
+							AppUserRole appUserRole = ModelData.appUserRoles.stream()
+									.filter(a -> a.getId().doubleValue() == id.doubleValue()).findFirst().orElse(null);
+							if (appUserRole != null) {
+								ModelData.appUserRoles.remove(appUserRole);
+							}
+						} else {
+							AppUserRole appUserRole = jsonToObject(jsonObject, AppUserRole.class);
+
+							if (ModelData.appUserRoles.stream().filter(a -> a.getId().doubleValue() == id.doubleValue())
+									.toList().isEmpty()) {
+								ModelData.appUserRoles.add(appUserRole);
+							} else {
+								AppUserRole appUserRoleCurrent = ModelData.appUserRoles.stream()
+										.filter(a -> a.getId().doubleValue() == id.doubleValue()).toList().get(0);
+								int index = ModelData.appUserRoles.indexOf(appUserRoleCurrent);
+								ModelData.appUserRoles.set(index, appUserRole);
+
+							}
+						}
+						break;
+					}
 					}
 
 				}
@@ -160,6 +281,80 @@ public class DatabaseListenerJob implements Job {
 
 		}
 
+	}
+
+	private <C> C jsonToObject(JSONObject jsonObject, Class<C> inClass) {
+		try {
+			C object = inClass.getConstructor().newInstance();
+
+			for (Field field : inClass.getDeclaredFields()) {
+				field.setAccessible(true);
+				String fieldName = field.getName();
+				String fieldType = field.getType().getSimpleName();
+
+				if (!(field.isAnnotationPresent(Id.class) || field.isAnnotationPresent(Column.class)
+						|| field.isAnnotationPresent(JoinColumn.class))) {
+					continue;
+				}
+
+				String columnName = fieldName;
+
+				if (field.isAnnotationPresent(Column.class)) {
+					Column column = field.getAnnotation(Column.class);
+					if (this.commonService.hasText(column.name())) {
+						columnName = column.name();
+					}
+				}
+
+				if (field.isAnnotationPresent(JoinColumn.class)) {
+					JoinColumn column = field.getAnnotation(JoinColumn.class);
+					if (this.commonService.hasText(column.name())) {
+						columnName = column.name();
+					}
+				}
+
+				if (jsonObject.get(columnName) == null) {
+					field.set(object, null);
+					continue;
+				}
+
+				Object value = jsonObject.get(columnName);
+
+				switch (fieldType) {
+				case "String": {
+					field.set(object, value.toString());
+					break;
+				}
+				case "Long": {
+					Number number = (Number) value;
+					field.set(object, number.longValue());
+					break;
+				}
+				case "LocalDateTime": {
+					field.set(object, LocalDateTime.parse(value.toString()));
+					break;
+				}
+				case "Boolean": {
+					field.set(object, Boolean.valueOf(value.toString()));
+					break;
+				}
+				default: {
+					Number number = (Number) value;
+					Object subObject = field.getType().getConstructor().newInstance();
+					Field idField = field.getType().getDeclaredField("id");
+					idField.setAccessible(true);
+					idField.set(subObject, number.longValue());
+					field.set(object, subObject);
+
+				}
+				}
+
+			}
+
+			return object;
+		} catch (Exception e) {
+			throw new WebApplicationException(e);
+		}
 	}
 
 }

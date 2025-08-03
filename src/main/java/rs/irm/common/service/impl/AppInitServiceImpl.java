@@ -53,13 +53,17 @@ import rs.irm.administration.dto.ReportDTO;
 import rs.irm.administration.dto.ReportGroupDTO;
 import rs.irm.administration.dto.ReportGroupRolesDTO;
 import rs.irm.administration.dto.ReportJobDTO;
+import rs.irm.administration.entity.AppUser;
+import rs.irm.administration.entity.AppUserRole;
 import rs.irm.administration.entity.ModelJasperReport;
 import rs.irm.administration.entity.ReportJasper;
 import rs.irm.administration.entity.ReportJob;
+import rs.irm.administration.entity.Role;
 import rs.irm.administration.service.LoadReportJobService;
 import rs.irm.administration.service.impl.LoadReportJobServiceImpl;
 import rs.irm.administration.utils.ModelData;
 import rs.irm.common.dto.ComboboxDTO;
+import rs.irm.common.entity.TokenDatabase;
 import rs.irm.common.service.AppInitService;
 import rs.irm.common.utils.CheckAdmin;
 import rs.irm.common.utils.CheckNotificationTrigger;
@@ -291,14 +295,17 @@ public class AppInitServiceImpl implements AppInitService {
 		String[] functionsFiles = new String[] { "notification_listener.sql", "model_listener.sql",
 				"modelcolumn_listener.sql", "modeljasperreport_listener.sql", "reportgrouprole_listener.sql",
 				"report_listener.sql", "dashboard_listener.sql", "dashboardrole_listener.sql", "reportjob_listener.sql",
-				"modelprocedure_listener.sql" };
+				"modelprocedure_listener.sql", "tokendatatable_listen.sql", "appuser_listen.sql", "role_listen.sql",
+				"appuserrole_listen.sql" };
 
 		String[] tables = new String[] { "notification", "model", "modelcolumn", "modeljasperreport",
-				"reportgroup_role", "report", "dashboard", "dashboard_role", "reportjob", "modelprocedure" };
+				"reportgroup_role", "report", "dashboard", "dashboard_role", "reportjob", "modelprocedure",
+				"tokendatabase", "appuser", "role", "appuser_role" };
 
 		String[] triggers = new String[] { "listener_notification", "listener_model", "listener_modelcolumn",
 				"listener_modeljasperreport", "listener_reportgrouprole", "listener_report", "listener_dashboard",
-				"listener_dashboardrole", "listener_reportjob", "listener_modelprocedure" };
+				"listener_dashboardrole", "listener_reportjob", "listener_modelprocedure", "listen_tokendatabase",
+				"listen_appuser", "listen_role", "listen_appuserrole" };
 
 		int index = -1;
 		for (String functionFile : functionsFiles) {
@@ -384,6 +391,10 @@ public class AppInitServiceImpl implements AppInitService {
 		ModelData.listReportJobDTOs = this.datatableService.findAll(new TableParameterDTO(), ReportJobDTO.class);
 		ModelData.reportJobStates = new LinkedHashMap<>();
 		ModelData.modelProcedureDTOs = this.datatableService.findAll(new TableParameterDTO(), ModelProcedureDTO.class);
+		ModelData.datatableTokens = this.datatableService.findAll(new TableParameterDTO(), TokenDatabase.class);
+		ModelData.appUsers = this.datatableService.findAll(new TableParameterDTO(), AppUser.class);
+		ModelData.roles = this.datatableService.findAll(new TableParameterDTO(), Role.class);
+		ModelData.appUserRoles = this.datatableService.findAll(new TableParameterDTO(), AppUserRole.class);
 
 	}
 

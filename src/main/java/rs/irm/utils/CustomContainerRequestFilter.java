@@ -37,9 +37,9 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
-import rs.irm.administration.dto.RoleForUserDTO;
 import rs.irm.administration.entity.AppUser;
-import rs.irm.common.dto.TokenDatabaseDTO;
+import rs.irm.administration.entity.AppUserRole;
+import rs.irm.administration.utils.ModelData;
 import rs.irm.common.entity.TokenDatabase;
 import rs.irm.common.exceptions.CommonException;
 import rs.irm.common.exceptions.FieldRequiredException;
@@ -48,8 +48,6 @@ import rs.irm.common.exceptions.MinimumException;
 import rs.irm.common.service.LoginService;
 import rs.irm.database.dto.TableParameterDTO;
 import rs.irm.database.enums.SearchOperation;
-import rs.irm.database.service.DatatableService;
-import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.TableFilter;
 
 public class CustomContainerRequestFilter implements ContainerRequestFilter {
@@ -59,9 +57,6 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 
 	@Context
 	private HttpServletResponse httpServletResponse;
-
-	@Inject
-	private DatatableService datatableService;
 
 	@Inject
 	private ResourceInfo resourceInfo;
@@ -211,8 +206,8 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "noCookie", null);
 		}
 
-		TokenDatabaseDTO tokenDatabaseDTO=null;
-		
+		TokenDatabase tokenDatabaseDTO;
+	
 		try {
 			tokenDatabaseDTO=checkToken(session, refresh_token);
 		}catch(Exception e) {
@@ -222,28 +217,36 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 
 		if (now.isAfter(tokenDatabaseDTO.getSessionEnd())) {
 			TokenDatabase tokenDatabase = this.loginService.insertTokenToBase(tokenDatabaseDTO.getId(),
-					new AppUser(tokenDatabaseDTO.getAppUserId()), true);
-			session=tokenDatabase.getSessionToken();
+					tokenDatabaseDTO.getAppUser(), true);
+			 
+			session=tokenDatabaseDTO.getSessionToken();
 			httpServletResponse.addCookie(loginService.createCookie("session", tokenDatabase.getSessionToken(),
 					AppParameters.refreshtokenduration.intValue() * 60));
 			httpServletResponse.addCookie(loginService.createCookie("refresh_token", tokenDatabase.getRefreshToken(),
 					AppParameters.refreshtokenduration.intValue() * 60));
+			
+			TokenDatabase tokenDatableCurrent=ModelData.datatableTokens.stream().filter(a->a.getId().doubleValue()==tokenDatabase.getId().doubleValue())
+					.findFirst().get();
+			int index=ModelData.datatableTokens.indexOf(tokenDatableCurrent);
+			if(index>-1) {
+				ModelData.datatableTokens.set(index, tokenDatabase);
+			}
 		}
+		
+		AppUser appUser=ModelData.appUsers.stream().filter(a->a.getId().doubleValue()==tokenDatabaseDTO.getAppUser().getId().doubleValue())
+				.findFirst().get();
 
-		httpServletRequest.setAttribute("username", tokenDatabaseDTO.getAppUserUsername());
-		httpServletRequest.setAttribute("userid", tokenDatabaseDTO.getAppUserId());
+		httpServletRequest.setAttribute("username", appUser.getUsername());
+		httpServletRequest.setAttribute("userid", appUser.getId());
 		httpServletRequest.setAttribute("language", lang);
 		httpServletRequest.setAttribute("session", session);
 
-		TableParameterDTO tableParameterDTO = new TableParameterDTO();
-		TableFilter tableFilter = new TableFilter();
-		tableFilter.setField("appUserId");
-		tableFilter.setParameter1(String.valueOf(tokenDatabaseDTO.getAppUserId()));
-		tableFilter.setSearchOperation(SearchOperation.equals);
-		tableParameterDTO.getTableFilters().add(tableFilter);
-		List<RoleForUserDTO> userRoleDTOs = datatableService.findAll(tableParameterDTO, RoleForUserDTO.class);
+		List<AppUserRole> userRoles = ModelData.appUserRoles.stream().filter(a->a.getAppUser().getId().doubleValue()==appUser.getId().doubleValue())
+				.toList();
 
-		List<String> roles = userRoleDTOs.stream().map(a -> a.getRoleCode()).toList();
+		List<String> roles = userRoles.stream().map(a -> findRoleCode(a.getRole().getId()))
+				.filter(a->a!=null)
+				.toList();
 		httpServletRequest.setAttribute("roles", roles);
 		Method method = resourceInfo.getResourceMethod();
 
@@ -265,30 +268,43 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 		}
 	}
 	
-	public TokenDatabaseDTO checkToken(String session,String refresh_token) throws Exception{
-		
-		datatableService=datatableService==null?new DatatableServiceImpl():datatableService;
+	private String findRoleCode(Long roleId) {
+		return ModelData.roles.stream().filter(a->a.getId().doubleValue()==roleId.doubleValue())
+				.map(a->a.getCode()).findFirst().orElse(null);
+	}
+	
+	public TokenDatabase checkToken(String session,String refresh_token) throws Exception{
 
 		LocalDateTime now=LocalDateTime.now();
 		TableParameterDTO tableParameterDTO = new TableParameterDTO();
 		tableParameterDTO.getTableFilters().add(new TableFilter("sessionToken", SearchOperation.equals, session, null));
-		List<TokenDatabaseDTO> tokenDatabaseDTOs = this.datatableService.findAll(tableParameterDTO,
-				TokenDatabaseDTO.class);
+		List<TokenDatabase> tokenDatabaseDTOs = ModelData.datatableTokens.stream().filter(a->a.getSessionToken().equals(session))
+				.toList();
 
 		if (tokenDatabaseDTOs.isEmpty()) {
 			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "wrongToken", null);
 		}
 		
-		TokenDatabaseDTO tokenDatabaseDTO = tokenDatabaseDTOs.get(0);
-
-		if (!tokenDatabaseDTO.getAppUserActive()) {
+		TokenDatabase tokenDatabaseDTO = tokenDatabaseDTOs.get(0);
+		
+		List<AppUser> appUsers=ModelData.appUsers.stream().filter(a->a.getId().doubleValue()==tokenDatabaseDTO.getAppUser().getId().doubleValue())
+				.toList();
+		
+		if(appUsers.isEmpty()) {
 			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "userIsNotActive",
-					tokenDatabaseDTO.getAppUserUsername());
+					null);
+		}
+		
+		AppUser appUser=appUsers.get(0);
+
+		if (!appUser.getActive()) {
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "userIsNotActive",
+					appUser.getUsername());
 		}
 		
 		if (!tokenDatabaseDTO.getRefreshToken().equals(refresh_token)) {
 			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "wrongRefreshToken",
-					tokenDatabaseDTO.getAppUserUsername());
+					appUser.getUsername());
 		}
 
 		if (!tokenDatabaseDTO.getActive()) {

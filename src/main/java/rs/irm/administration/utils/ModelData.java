@@ -15,6 +15,10 @@ import rs.irm.administration.dto.ReportGroupDTO;
 import rs.irm.administration.dto.ReportGroupRolesDTO;
 import rs.irm.administration.dto.ReportJobDTO;
 import rs.irm.administration.dto.ReportJobSessionDTO;
+import rs.irm.administration.entity.AppUser;
+import rs.irm.administration.entity.AppUserRole;
+import rs.irm.administration.entity.Role;
+import rs.irm.common.entity.TokenDatabase;
 
 public class ModelData {
 
@@ -29,4 +33,8 @@ public class ModelData {
 	public static List<ReportJobDTO> listReportJobDTOs=new ArrayList<>();
 	public static LinkedHashMap<Long, ReportJobSessionDTO> reportJobStates=new LinkedHashMap<>();
 	public static List<ModelProcedureDTO> modelProcedureDTOs=new ArrayList<>();
+	public static List<TokenDatabase> datatableTokens=new ArrayList<>();
+	public static List<AppUser> appUsers=new ArrayList<>();
+	public static List<Role> roles=new ArrayList<>();
+	public static List<AppUserRole> appUserRoles=new ArrayList<>();
 }

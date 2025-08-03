@@ -24,7 +24,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import rs.irm.common.dto.TokenDatabaseDTO;
+import rs.irm.common.entity.TokenDatabase;
 import rs.irm.common.exceptions.CommonException;
 
 @ServerEndpoint(value = "/socket/notify", configurator = CustomSocketConfigurator.class)
@@ -64,7 +64,7 @@ public class NotificationSocket {
 		if (parameters.get("session") == null || parameters.get("refresh_token") == null) {
 			throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "noToken", null);
 		}
-		TokenDatabaseDTO tokenDatatableDTO = null;
+		TokenDatabase tokenDatatableDTO = null;
 		try {
 			tokenDatatableDTO = new CustomContainerRequestFilter().checkToken(parameters.get("session"),
 					parameters.get("refresh_token"));
@@ -74,7 +74,7 @@ public class NotificationSocket {
 
 		Long userid = Long.valueOf(session.getQueryString().substring(3));
 
-		if (userid.doubleValue() != tokenDatatableDTO.getAppUserId().doubleValue()) {
+		if (userid.doubleValue() != tokenDatatableDTO.getAppUser().getId().doubleValue()) {
 			throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "wrongUser", userid);
 		}
 
