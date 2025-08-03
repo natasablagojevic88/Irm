@@ -19,7 +19,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Context;
 import rs.irm.administration.entity.AppUser;
-import rs.irm.administration.utils.ModelData;
 import rs.irm.common.dto.ComboboxDTO;
 import rs.irm.common.dto.LoginDTO;
 import rs.irm.common.entity.TokenDatabase;
@@ -85,11 +84,6 @@ public class LoginServiceImpl implements LoginService {
 				AppParameters.refreshtokenduration.intValue() * 60));
 		servletResponse.addCookie(createCookie("lang", loginDTO.getLanguage().name(),
 				AppParameters.refreshtokenduration.intValue() * 60));
-
-		if (ModelData.datatableTokens.stream()
-				.filter(a -> a.getId().doubleValue() == tokenDatabase.getId().doubleValue()).toList().isEmpty()) {
-			ModelData.datatableTokens.add(tokenDatabase);
-		}
 	}
 
 	@Override

@@ -63,7 +63,6 @@ import rs.irm.administration.service.LoadReportJobService;
 import rs.irm.administration.service.impl.LoadReportJobServiceImpl;
 import rs.irm.administration.utils.ModelData;
 import rs.irm.common.dto.ComboboxDTO;
-import rs.irm.common.entity.TokenDatabase;
 import rs.irm.common.service.AppInitService;
 import rs.irm.common.utils.CheckAdmin;
 import rs.irm.common.utils.CheckNotificationTrigger;
@@ -391,7 +390,6 @@ public class AppInitServiceImpl implements AppInitService {
 		ModelData.listReportJobDTOs = this.datatableService.findAll(new TableParameterDTO(), ReportJobDTO.class);
 		ModelData.reportJobStates = new LinkedHashMap<>();
 		ModelData.modelProcedureDTOs = this.datatableService.findAll(new TableParameterDTO(), ModelProcedureDTO.class);
-		ModelData.datatableTokens = this.datatableService.findAll(new TableParameterDTO(), TokenDatabase.class);
 		ModelData.appUsers = this.datatableService.findAll(new TableParameterDTO(), AppUser.class);
 		ModelData.roles = this.datatableService.findAll(new TableParameterDTO(), Role.class);
 		ModelData.appUserRoles = this.datatableService.findAll(new TableParameterDTO(), AppUserRole.class);
