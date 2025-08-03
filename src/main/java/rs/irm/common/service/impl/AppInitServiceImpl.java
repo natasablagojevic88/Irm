@@ -294,17 +294,16 @@ public class AppInitServiceImpl implements AppInitService {
 		String[] functionsFiles = new String[] { "notification_listener.sql", "model_listener.sql",
 				"modelcolumn_listener.sql", "modeljasperreport_listener.sql", "reportgrouprole_listener.sql",
 				"report_listener.sql", "dashboard_listener.sql", "dashboardrole_listener.sql", "reportjob_listener.sql",
-				"modelprocedure_listener.sql", "tokendatatable_listen.sql", "appuser_listen.sql", "role_listen.sql",
-				"appuserrole_listen.sql" };
+				"modelprocedure_listener.sql", "appuser_listen.sql", "role_listen.sql", "appuserrole_listen.sql" };
 
 		String[] tables = new String[] { "notification", "model", "modelcolumn", "modeljasperreport",
-				"reportgroup_role", "report", "dashboard", "dashboard_role", "reportjob", "modelprocedure",
-				"tokendatabase", "appuser", "role", "appuser_role" };
+				"reportgroup_role", "report", "dashboard", "dashboard_role", "reportjob", "modelprocedure", "appuser",
+				"role", "appuser_role" };
 
 		String[] triggers = new String[] { "listener_notification", "listener_model", "listener_modelcolumn",
 				"listener_modeljasperreport", "listener_reportgrouprole", "listener_report", "listener_dashboard",
-				"listener_dashboardrole", "listener_reportjob", "listener_modelprocedure", "listen_tokendatabase",
-				"listen_appuser", "listen_role", "listen_appuserrole" };
+				"listener_dashboardrole", "listener_reportjob", "listener_modelprocedure", "listen_appuser",
+				"listen_role", "listen_appuserrole" };
 
 		int index = -1;
 		for (String functionFile : functionsFiles) {
