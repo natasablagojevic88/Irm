@@ -4,6 +4,7 @@ public enum BaseType {
 
 	bigserial,
 	varchar,
+	text,
 	int4,
 	numeric,
 	date,

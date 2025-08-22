@@ -71,6 +71,7 @@ import rs.irm.common.utils.CreateNotificatonFunction;
 import rs.irm.common.utils.ReadNotificationFunction;
 import rs.irm.database.dto.TableParameterDTO;
 import rs.irm.database.enums.BaseType;
+import rs.irm.database.enums.Text;
 import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.CreateColumnData;
@@ -270,7 +271,7 @@ public class AppInitServiceImpl implements AppInitService {
 		case "Long":
 			return BaseType.numeric;
 		case "String":
-			return BaseType.varchar;
+			return field.isAnnotationPresent(Text.class) ? BaseType.text : BaseType.varchar;
 		case "Integer":
 			return BaseType.int4;
 		case "BigDecimal":

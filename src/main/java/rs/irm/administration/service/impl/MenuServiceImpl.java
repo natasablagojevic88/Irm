@@ -94,6 +94,12 @@ public class MenuServiceImpl implements MenuService {
 			mailservers.setUrl("/administration/mailservers");
 			administration.getChildren().add(mailservers);
 			
+			MenuDTO javaClass = new MenuDTO();
+			javaClass.setIcon("fa fa-coffee");
+			javaClass.setName(resourceBundleService.getText("JavaClassDTO.title", null));
+			javaClass.setUrl("/administration/java-class");
+			administration.getChildren().add(javaClass);
+			
 			MenuDTO jobs = new MenuDTO();
 			jobs.setIcon("fa fa-clock-o");
 			jobs.setName(resourceBundleService.getText("JobInfoDTO.title", null));
