@@ -75,7 +75,7 @@ public class UpdateReport implements ExecuteMethodWithReturn<ReportDTO> {
 			standardReport(report, reportDTO, connection);
 		} else if (report.getType().equals(ReportType.GRAPH)) {
 			graphReport(report, reportDTO, connection);
-		} else if (report.getType().equals(ReportType.SQL) || report.getType().equals(ReportType.KPI)) {
+		} else if (report.getType().equals(ReportType.SQL) || report.getType().equals(ReportType.KPI) || report.getType().equals(ReportType.CARD)) {
 			sqlReport(report, reportDTO, connection);
 		} else if (report.getType().equals(ReportType.JASPER)) {
 			jasperReport(report, reportDTO, connection);

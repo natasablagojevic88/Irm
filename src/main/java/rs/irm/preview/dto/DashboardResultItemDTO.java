@@ -33,4 +33,7 @@ public class DashboardResultItemDTO {
 	private SqlResultDTO sqlResultDTO;
 	
 	private Base64DownloadFileDTO jasperBase64;
+	
+	private CardResultDTO cardReportResult;
+
 }

@@ -228,6 +228,12 @@ public class CreateDashboardData implements ExecuteMethodWithReturn<DashboardRes
 			item.setJasperBase64(commonService.responseToBase64(previewJasperReport.execute(connection)));
 			break;
 		}
+		case "CARD": {
+			CreateCardReport createCardReport=new CreateCardReport(reportId, httpServletRequest);
+			CreateCardReportResult createCardReportResult=new CreateCardReportResult(reportId, this.datatableService.executeMethodWithReturn(createCardReport,connection), httpServletRequest);
+			item.setCardReportResult(this.datatableService.executeMethodWithReturn(createCardReportResult,connection));
+			break;
+		}
 		default: {
 			throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "notImplemented", typeOfReport);
 		}

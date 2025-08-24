@@ -142,7 +142,7 @@ public class SqlQueryExecute implements ExecuteMethodWithReturn<SqlResultDTO> {
 				SqlResultColumnDTO resultColumnDTO = sqlResultDTO.getColumns().stream()
 						.filter(a -> a.getOrderNumber().doubleValue() == totalColumn.doubleValue()).findFirst().get();
 
-				bufferedWriter.write("coalesce(sum(" + resultColumnDTO.getName() + "),0)");
+				bufferedWriter.write("coalesce(sum(\"" + resultColumnDTO.getName() + "\"),0)");
 				bufferedWriter.newLine();
 
 			}

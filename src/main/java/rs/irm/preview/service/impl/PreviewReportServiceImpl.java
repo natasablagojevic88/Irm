@@ -20,10 +20,13 @@ import rs.irm.common.service.CommonService;
 import rs.irm.common.service.ResourceBundleService;
 import rs.irm.common.utils.CheckAdmin;
 import rs.irm.database.service.DatatableService;
+import rs.irm.preview.dto.CardResultDTO;
 import rs.irm.preview.dto.ReportParameterDTO;
 import rs.irm.preview.dto.ReportPreviewInfoDTO;
 import rs.irm.preview.dto.TableReportParameterDTO;
 import rs.irm.preview.service.PreviewReportService;
+import rs.irm.preview.utils.CreateCardReport;
+import rs.irm.preview.utils.CreateCardReportResult;
 import rs.irm.preview.utils.CreateStandardParameters;
 import rs.irm.preview.utils.PreviewExecuteReport;
 import rs.irm.preview.utils.PreviewGraphReport;
@@ -192,6 +195,20 @@ public class PreviewReportServiceImpl implements PreviewReportService {
 		checkRight(reportId);
 		PreviewExecuteReport previewExecuteReport=new PreviewExecuteReport(this.httpServletRequest,reportId,tableReportParameterDTO);
 		return this.datatableService.executeMethodWithReturn(previewExecuteReport);
+	}
+
+	@Override
+	public CardResultDTO getCardReportParameter(Long reportId) {
+		checkRight(reportId);
+		CreateCardReport createCardReport=new CreateCardReport(reportId, httpServletRequest);
+		return this.datatableService.executeMethodWithReturn(createCardReport);
+	}
+
+	@Override
+	public CardResultDTO getCardReportResult(Long reportId, CardResultDTO cardResultDTO) {
+		checkRight(reportId);
+		CreateCardReportResult createCardReportResult= new CreateCardReportResult(reportId,cardResultDTO,this.httpServletRequest);
+		return this.datatableService.executeMethodWithReturn(createCardReportResult);
 	}
 
 }

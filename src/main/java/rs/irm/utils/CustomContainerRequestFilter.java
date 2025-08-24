@@ -302,6 +302,11 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "tokenExpired", null);
 		}
 
+		if (!tokenDatabaseDTO.getAppUserActive()) {
+			throw new CommonException(HttpURLConnection.HTTP_UNAUTHORIZED, "userIsNotActive",
+					tokenDatabaseDTO.getAppUserUsername());
+		}
+
 		return tokenDatabaseDTO;
 	}
 

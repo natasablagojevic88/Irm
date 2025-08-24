@@ -7,5 +7,6 @@ public enum ReportType {
 	SQL,
 	KPI,
 	JASPER,
-	EXECUTE
+	EXECUTE,
+	CARD
 }

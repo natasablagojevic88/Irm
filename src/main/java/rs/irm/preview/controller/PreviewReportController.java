@@ -18,6 +18,7 @@ import jakarta.ws.rs.core.Response;
 import rs.irm.administration.dto.SqlExecuteResultDTO;
 import rs.irm.administration.dto.SqlResultDTO;
 import rs.irm.common.dto.Base64DownloadFileDTO;
+import rs.irm.preview.dto.CardResultDTO;
 import rs.irm.preview.dto.ReportPreviewInfoDTO;
 import rs.irm.preview.dto.TableReportParameterDTO;
 import rs.irm.preview.service.PreviewReportService;
@@ -102,6 +103,27 @@ public class PreviewReportController {
 			@PathParam("reportid") Long reportId) {
 
 		return Response.ok(this.previewReportService.getExecuteReport(tableReportParameterDTO, reportId)).build();
+	}
+	
+	@GET
+	@Path("/card-report/{reportid}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = CardResultDTO.class)))
+	public Response getCardReportParameter(@PathParam("reportid") Long reportId) {
+
+		return Response.ok(this.previewReportService.getCardReportParameter(reportId)).build();
+	}
+	
+	@POST
+	@Path("/card-report/{reportid}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = CardResultDTO.class)))
+	public Response getCardReportResult(
+			CardResultDTO cardResultDTO,
+			@PathParam("reportid") Long reportId) {
+
+		return Response.ok(this.previewReportService.getCardReportResult(reportId, cardResultDTO)).build();
 	}
 
 }
