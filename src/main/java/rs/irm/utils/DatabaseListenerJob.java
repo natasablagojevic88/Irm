@@ -1,6 +1,12 @@
 package rs.irm.utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
@@ -36,6 +42,8 @@ import rs.irm.administration.dto.ReportGroupRolesDTO;
 import rs.irm.administration.dto.ReportJobDTO;
 import rs.irm.administration.entity.AppUser;
 import rs.irm.administration.entity.AppUserRole;
+import rs.irm.administration.entity.ModelJasperReport;
+import rs.irm.administration.entity.ReportJasper;
 import rs.irm.administration.entity.Role;
 import rs.irm.administration.utils.ModelData;
 import rs.irm.common.service.CommonService;
@@ -61,6 +69,7 @@ public class DatabaseListenerJob implements Job {
 	public final static String appuser_listener = "appuser_listen";
 	public final static String role_listener = "role_listen";
 	public final static String appuserrole_listener = "appuserrole_listen";
+	public final static String reportjasper_listener = "reportjasper_listen";
 	ExecutorService websocketSender = Executors.newFixedThreadPool(10);
 
 	DatatableService datatableService = new DatatableServiceImpl();
@@ -94,6 +103,7 @@ public class DatabaseListenerJob implements Job {
 				statement.execute("LISTEN " + appuser_listener);
 				statement.execute("LISTEN " + role_listener);
 				statement.execute("LISTEN " + appuserrole_listener);
+				statement.execute("LISTEN " + reportjasper_listener);
 				statement.close();
 			}
 			PGConnection pgConnection = AppConnections.datatabeListener.unwrap(PGConnection.class);
@@ -128,6 +138,32 @@ public class DatabaseListenerJob implements Job {
 					case modeljasperreport_listener: {
 						ModelData.listModelJasperReportDTOs = this.datatableService.findAll(new TableParameterDTO(),
 								ModelJasperReportDTO.class);
+						JSONObject jsonObject = (JSONObject) new JSONParser().parse(notification.getParameter());
+						Long id = ((Number) jsonObject.get("id")).longValue();
+
+						if (jsonObject.get("action").equals("INSERT") || jsonObject.get("action").equals("UPDATE")) {
+							try {
+								ModelJasperReport jasperReport = this.datatableService.findByExistingId(id,
+										ModelJasperReport.class);
+
+								File jasperFolder = new File(AppParameters.jasperfilepath);
+
+								if (!(jasperFolder.exists() && jasperFolder.isDirectory())) {
+									jasperFolder.mkdirs();
+								}
+								try {
+									Files.copy(new ByteArrayInputStream(jasperReport.getBytes()),
+											Paths.get(jasperFolder.getAbsolutePath() + "/"
+													+ jasperReport.getJasperFileName()),
+											StandardCopyOption.REPLACE_EXISTING);
+								} catch (IOException e) {
+									throw new WebApplicationException(e);
+								}
+							} catch (Exception e) {
+								logger.error(e.getMessage(), e);
+							}
+						}
+
 						break;
 					}
 					case reportgroup_listener: {
@@ -236,6 +272,29 @@ public class DatabaseListenerJob implements Job {
 								int index = ModelData.appUserRoles.indexOf(appUserRoleCurrent);
 								ModelData.appUserRoles.set(index, appUserRole);
 
+							}
+						}
+						break;
+					}
+					case reportjasper_listener: {
+						JSONObject jsonObject = (JSONObject) new JSONParser().parse(notification.getParameter());
+						Long id = ((Number) jsonObject.get("id")).longValue();
+
+						if (jsonObject.get("action").equals("UPDATE") || jsonObject.get("action").equals("INSERT")) {
+							ReportJasper reportJasper = this.datatableService.findByExistingId(id, ReportJasper.class);
+							File jasperPath = new File(AppParameters.jasperreportpath);
+							if (!(jasperPath.isDirectory() && jasperPath.exists())) {
+								jasperPath.mkdirs();
+							}
+
+							File createdJasperFile = new File(
+									jasperPath.getAbsolutePath() + "/" + reportJasper.getName());
+							try {
+								Files.copy(new ByteArrayInputStream(reportJasper.getBytes()),
+										Paths.get(createdJasperFile.getAbsolutePath()),
+										StandardCopyOption.REPLACE_EXISTING);
+							} catch (IOException e) {
+								throw new WebApplicationException(e);
 							}
 						}
 						break;

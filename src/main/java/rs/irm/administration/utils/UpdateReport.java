@@ -1,12 +1,6 @@
 package rs.irm.administration.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -33,6 +27,7 @@ import rs.irm.administration.entity.ReportFilter;
 import rs.irm.administration.entity.ReportJasper;
 import rs.irm.administration.enums.GraphType;
 import rs.irm.administration.enums.ReportType;
+import rs.irm.common.entity.UploadFile;
 import rs.irm.common.exceptions.CommonException;
 import rs.irm.common.exceptions.FieldRequiredException;
 import rs.irm.common.service.CommonService;
@@ -44,7 +39,6 @@ import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethodWithReturn;
 import rs.irm.database.utils.LeftTableData;
 import rs.irm.database.utils.TableFilter;
-import rs.irm.utils.AppParameters;
 
 public class UpdateReport implements ExecuteMethodWithReturn<ReportDTO> {
 
@@ -274,22 +268,30 @@ public class UpdateReport implements ExecuteMethodWithReturn<ReportDTO> {
 		report = this.datatableService.save(report, connection);
 
 		if (reportDTO.getFilePath() != null) {
-			File file = new File(reportDTO.getFilePath());
-
-			if (!file.exists()) {
+			TableParameterDTO tableParameterDTO=new TableParameterDTO();
+			TableFilter tableFilter=new TableFilter();
+			tableFilter.setField("uuid");
+			tableFilter.setParameter1(reportDTO.getFilePath());
+			tableFilter.setSearchOperation(SearchOperation.equals);
+			tableParameterDTO.getTableFilters().add(tableFilter);
+			List<UploadFile> uploadFiles=this.datatableService.findAll(tableParameterDTO, UploadFile.class, connection);
+			
+			if(uploadFiles.isEmpty()) {
 				throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "noFile", null);
 			}
-			byte[] bytes = null;
-			try {
-				bytes = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
-			} catch (IOException e) {
-				throw new WebApplicationException(e);
+			
+			UploadFile uploadFile=uploadFiles.get(0);
+
+			if(commonService.getAppUser().getId().doubleValue()!=uploadFile.getAppUser().getId().doubleValue()) {
+				throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "wrongUser", null);
 			}
+			byte[] bytes = uploadFile.getBytes();
+
 			ReportJasper reportJasper = new ReportJasper();
 			reportJasper.setId(0L);
 			reportJasper.setReport(report);
 			if (reportDTO.getId() != 0) {
-				TableParameterDTO tableParameterDTO = new TableParameterDTO();
+				tableParameterDTO = new TableParameterDTO();
 				tableParameterDTO.getTableFilters()
 						.add(new TableFilter("report", SearchOperation.equals, String.valueOf(report.getId()), null));
 				reportJasper = this.datatableService.findAll(tableParameterDTO, ReportJasper.class, connection).get(0);
@@ -299,19 +301,9 @@ public class UpdateReport implements ExecuteMethodWithReturn<ReportDTO> {
 			reportJasper.setBytes(bytes);
 
 			this.datatableService.save(reportJasper, connection);
+			
+			this.datatableService.delete(uploadFile, connection);
 
-			File jasperPath = new File(AppParameters.jasperreportpath);
-			if (!(jasperPath.isDirectory() && jasperPath.exists())) {
-				jasperPath.mkdirs();
-			}
-
-			File createdJasperFile = new File(jasperPath.getAbsolutePath() + "/" + reportJasper.getName());
-			try {
-				Files.copy(new ByteArrayInputStream(bytes), Paths.get(createdJasperFile.getAbsolutePath()),
-						StandardCopyOption.REPLACE_EXISTING);
-			} catch (IOException e) {
-				throw new WebApplicationException(e);
-			}
 
 		}
 		addParametersToReport(connection, report);

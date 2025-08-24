@@ -29,6 +29,7 @@ import rs.irm.administration.dto.ModelTriggerDTO;
 import rs.irm.administration.dto.NextRowColumnDTO;
 import rs.irm.administration.service.ModelService;
 import rs.irm.common.dto.ComboboxDTO;
+import rs.irm.common.service.CommonService;
 import rs.irm.common.service.impl.AppInitServiceImpl;
 import rs.irm.database.dto.TableDataDTO;
 import rs.irm.database.dto.TableParameterDTO;
@@ -39,6 +40,9 @@ public class ModelController {
 
 	@Inject
 	private ModelService modelService;
+	
+	@Inject
+	private CommonService commonService;
 
 	@GET
 	@Path("/tree")
@@ -245,7 +249,7 @@ public class ModelController {
 			File file
 		) {
 		
-		return Response.ok(new FileUploadPathDTO(file.getAbsolutePath())).build();
+		return Response.ok(commonService.uploadFile(file)).build();
 	}
 	
 	@POST

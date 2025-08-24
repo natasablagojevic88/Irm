@@ -1,30 +1,27 @@
 package rs.irm.administration.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
+import java.util.List;
 
 import org.modelmapper.ModelMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.dto.ModelJasperReportDTO;
 import rs.irm.administration.entity.ModelJasperReport;
 import rs.irm.administration.enums.ModelType;
+import rs.irm.common.entity.UploadFile;
 import rs.irm.common.exceptions.CommonException;
 import rs.irm.common.exceptions.FieldRequiredException;
 import rs.irm.common.service.CommonService;
 import rs.irm.common.service.impl.CommonServiceImpl;
+import rs.irm.database.dto.TableParameterDTO;
+import rs.irm.database.enums.SearchOperation;
 import rs.irm.database.service.DatatableService;
 import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.database.utils.ExecuteMethodWithReturn;
-import rs.irm.utils.AppParameters;
+import rs.irm.database.utils.TableFilter;
 
 public class ModelJasperReportUpdate implements ExecuteMethodWithReturn<ModelJasperReportDTO> {
 
@@ -60,39 +57,34 @@ public class ModelJasperReportUpdate implements ExecuteMethodWithReturn<ModelJas
 						connection);
 
 		if (commonService.hasText(modelJasperReportDTO.getFilePath())) {
-			File jasperFile = new File(modelJasperReportDTO.getFilePath());
-			if (!jasperFile.exists()) {
-				throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "noFile", jasperFile.getAbsolutePath());
+			
+			TableParameterDTO tableParameterDTO=new TableParameterDTO();
+			TableFilter tableFilter=new TableFilter();
+			tableFilter.setField("uuid");
+			tableFilter.setParameter1(modelJasperReportDTO.getFilePath());
+			tableFilter.setSearchOperation(SearchOperation.equals);
+			tableParameterDTO.getTableFilters().add(tableFilter);
+			List<UploadFile> uploadFiles=this.datatableService.findAll(tableParameterDTO, UploadFile.class, connection);
+			
+			if(uploadFiles.isEmpty()) {
+				throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "noFile", null);
+			}
+			
+			UploadFile uploadFile=uploadFiles.get(0);
+
+			if(commonService.getAppUser().getId().doubleValue()!=uploadFile.getAppUser().getId().doubleValue()) {
+				throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "wrongUser", null);
 			}
 
-			try {
-				modelJasperReport.setBytes(Files.readAllBytes(Paths.get(jasperFile.getAbsolutePath())));
-			} catch (IOException e) {
-				throw new WebApplicationException(e);
-			}
+			modelJasperReport.setBytes(uploadFile.getBytes());
+			
+			this.datatableService.delete(uploadFile);
 
 		}
 
 		modelMapper.map(modelJasperReportDTO, modelJasperReport);
 		modelJasperReport = this.datatableService.save(modelJasperReport, connection);
 
-		if (commonService.hasText(modelJasperReportDTO.getFilePath())) {
-
-			File jasperFolder = new File(AppParameters.jasperfilepath);
-
-			if (!(jasperFolder.exists() && jasperFolder.isDirectory())) {
-				jasperFolder.mkdirs();
-			}
-			File jasperFile = new File(modelJasperReportDTO.getFilePath());
-
-			try {
-				Files.copy(new ByteArrayInputStream(Files.readAllBytes(Paths.get(jasperFile.getAbsolutePath()))),
-						Paths.get(jasperFolder.getAbsolutePath() + "/" + modelJasperReport.getJasperFileName()),
-						StandardCopyOption.REPLACE_EXISTING);
-			} catch (IOException e) {
-				throw new WebApplicationException(e);
-			}
-		}
 		return modelMapper.map(modelJasperReport, ModelJasperReportDTO.class);
 	}
 

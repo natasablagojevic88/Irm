@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION listener_modeljasperreport()
+CREATE OR REPLACE FUNCTION listener_reportjasper()
 	RETURNS trigger
 	LANGUAGE plpgsql
 AS $function$
@@ -12,7 +12,7 @@ jsonText text;
 		select to_json(t.*)::TEXT into jsonText from (select old.id,TG_OP action) as t;
 	end if;
 
-    perform pg_notify('modeljasperreport_listen',jsonText);
+    perform pg_notify('reportjasper_listen',jsonText);
     
     return new;
 

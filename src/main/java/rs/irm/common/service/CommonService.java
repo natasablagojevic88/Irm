@@ -1,9 +1,11 @@
 package rs.irm.common.service;
 
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import jakarta.ws.rs.core.Response;
+import rs.irm.administration.dto.FileUploadPathDTO;
 import rs.irm.administration.entity.AppUser;
 import rs.irm.common.dto.Base64DownloadFileDTO;
 import rs.irm.common.dto.ComboboxDTO;
@@ -29,4 +31,6 @@ public interface CommonService {
 	Base64DownloadFileDTO responseToBase64(Response response);
 
 	void checkDefaultParameter(String query);
+	
+	FileUploadPathDTO uploadFile(File file);
 }

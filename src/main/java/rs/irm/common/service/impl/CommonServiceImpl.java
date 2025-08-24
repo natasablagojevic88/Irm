@@ -1,11 +1,17 @@
 package rs.irm.common.service.impl;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.UUID;
 
 import io.jsonwebtoken.lang.Arrays;
 import jakarta.inject.Named;
@@ -16,12 +22,16 @@ import jakarta.ws.rs.core.Response;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.select.Select;
+import rs.irm.administration.dto.FileUploadPathDTO;
 import rs.irm.administration.entity.AppUser;
 import rs.irm.common.dto.Base64DownloadFileDTO;
 import rs.irm.common.dto.ComboboxDTO;
+import rs.irm.common.entity.UploadFile;
 import rs.irm.common.exceptions.CommonException;
 import rs.irm.common.service.CommonService;
 import rs.irm.common.service.ResourceBundleService;
+import rs.irm.database.service.DatatableService;
+import rs.irm.database.service.impl.DatatableServiceImpl;
 import rs.irm.utils.AppParameters;
 
 @Named
@@ -160,6 +170,24 @@ public class CommonServiceImpl implements CommonService {
 			throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "unallowedQuery", null);
 		}
 		
+	}
+
+	@Override
+	public FileUploadPathDTO uploadFile(File file) {
+		DatatableService datatableService=new DatatableServiceImpl(this.httpServletRequest);
+		
+		UploadFile uploadFile=new UploadFile();
+		uploadFile.setId(0L);
+		uploadFile.setAppUser(getAppUser());
+		try {
+			uploadFile.setBytes(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
+		} catch (IOException e) {
+			throw new WebApplicationException(e);
+		}
+		uploadFile.setCurrentTime(LocalDateTime.now());
+		uploadFile.setUuid(UUID.randomUUID().toString());
+		datatableService.save(uploadFile);
+		return new FileUploadPathDTO(uploadFile.getUuid());
 	}
 
 
