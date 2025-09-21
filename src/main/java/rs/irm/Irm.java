@@ -33,7 +33,6 @@ public class Irm extends ResourceConfig {
 		register(customContainerRequestFilter);
 	}
 
-	@SuppressWarnings("serial")
 	private OpenApiResource openApiResource() {
 		OpenApiResource openApiResource = new OpenApiResource();
 		SwaggerConfiguration configuration = new SwaggerConfiguration();

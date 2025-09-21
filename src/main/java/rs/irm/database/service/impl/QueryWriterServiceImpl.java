@@ -29,7 +29,6 @@ import rs.irm.database.utils.TableSort;
 
 public class QueryWriterServiceImpl implements QueryWriterService {
 	private String bigLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	@SuppressWarnings("serial")
 	public static List<String> fieldTypes = new ArrayList<String>() {
 		{
 			add("String");
