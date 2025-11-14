@@ -9,4 +9,5 @@ public class AppConnections {
 	public static List<Connection> freeConnections;
 	public static Connection checkConnection;
 	public static Connection datatabeListener;
+	public static Connection logConnection;
 }

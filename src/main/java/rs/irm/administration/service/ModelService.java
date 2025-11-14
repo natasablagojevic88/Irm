@@ -6,6 +6,7 @@ import rs.irm.administration.dto.CheckParentDTO;
 import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.dto.ModelJasperReportDTO;
+import rs.irm.administration.dto.ModelJavaClassDTO;
 import rs.irm.administration.dto.ModelProcedureDTO;
 import rs.irm.administration.dto.ModelTriggerDTO;
 import rs.irm.administration.dto.NextRowColumnDTO;
@@ -69,4 +70,12 @@ public interface ModelService {
 	ModelProcedureDTO getUpdateProcedure(ModelProcedureDTO modelProcedureDTO);
 	
 	void getProcedureDelete(Long id);
+
+	TableDataDTO<ModelJavaClassDTO> getJavaClassTable(TableParameterDTO tableParameterDTO, Long modelId);
+
+	ModelJavaClassDTO getJavaClassUpdate(ModelJavaClassDTO modelJavaClassDTO);
+
+	void getJavaClassDelete(Long id);
+
+	List<ComboboxDTO> getJavaClasses();
 }

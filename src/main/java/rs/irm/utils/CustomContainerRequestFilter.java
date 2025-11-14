@@ -101,8 +101,10 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 				Class<?> parametersType = Class.forName(parameter.getType().getCanonicalName());
 
 				InputStream inputStream = containerRequestContext.getEntityStream();
+				byte[] bytes=inputStream.readAllBytes();
+				ByteArrayInputStream byteArrayInputStream=new ByteArrayInputStream(bytes);
 				JSONObject jsonBody = (JSONObject) new JSONParser()
-						.parse(new InputStreamReader(inputStream, Charset.forName("UTF-8")));
+						.parse(new InputStreamReader(byteArrayInputStream, Charset.forName("UTF-8")));
 
 				for (Field field : Arrays.asList(parametersType.getDeclaredFields())) {
 					field.setAccessible(true);
@@ -182,8 +184,7 @@ public class CustomContainerRequestFilter implements ContainerRequestFilter {
 					}
 				}
 
-				containerRequestContext.setEntityStream(
-						new ByteArrayInputStream(jsonBody.toJSONString().getBytes(Charset.forName("UTF-8"))));
+				containerRequestContext.setEntityStream(new ByteArrayInputStream(bytes));
 			} catch (Exception e) {
 				throw new WebApplicationException(e);
 			}

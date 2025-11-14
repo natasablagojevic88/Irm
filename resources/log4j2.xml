@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration>
-  <Appenders>
-    <Console name="CONSOLE"> 
-      <PatternLayout pattern="%p - %m%n"/>
-    </Console>
-    <File name="FILELOG" fileName="${sys:user.home}/.logs/irm.log"> 
-      <PatternLayout pattern="%d [%t] %p %c - %m%n"/>
-    </File>
-  </Appenders>
-  <Loggers>
-    <Root level="INFO"> 
-      <AppenderRef ref="CONSOLE" level="WARN"/>
-      <AppenderRef ref="FILELOG"/>
-    </Root>
-  </Loggers>
+<Configuration packages="rs.irm.utils">
+	<Appenders>
+		<Console name="CONSOLE">
+			<PatternLayout pattern="%p - %m%n" />
+		</Console>
+		<File name="FILELOG" fileName="${sys:user.home}/.logs/irm.log">
+			<PatternLayout pattern="%d [%t] %p %c - %m%n" />
+		</File>
+		<PgAppender name="DBLOG" >
+			
+		</PgAppender>
+		<Async name="ASYNC_DB" bufferSize="2048" blocking="false">
+			<AppenderRef ref="DBLOG" />
+		</Async>
+
+	</Appenders>
+	<Loggers>
+		<Root level="INFO">
+			<AppenderRef ref="CONSOLE" level="WARN" />
+			<AppenderRef ref="FILELOG" />
+			<AppenderRef ref="ASYNC_DB" />
+		</Root>
+	</Loggers>
 </Configuration>

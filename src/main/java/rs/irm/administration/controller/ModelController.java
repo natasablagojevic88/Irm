@@ -24,6 +24,7 @@ import rs.irm.administration.dto.FileUploadPathDTO;
 import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.dto.ModelJasperReportDTO;
+import rs.irm.administration.dto.ModelJavaClassDTO;
 import rs.irm.administration.dto.ModelProcedureDTO;
 import rs.irm.administration.dto.ModelTriggerDTO;
 import rs.irm.administration.dto.NextRowColumnDTO;
@@ -352,6 +353,53 @@ public class ModelController {
 			@PathParam("id") Long id
 		) {
 		this.modelService.getProcedureDelete(id);
+		return Response.noContent().build();
+	}
+	
+	@POST
+	@Path("/java-class/table/{modelid}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
+	@RolesAllowed("admin")
+	public Response getJavaClassTable(
+			TableParameterDTO tableParameterDTO, 
+			@PathParam("modelid") Long modelId
+		) {
+		return Response.ok(modelService.getJavaClassTable(tableParameterDTO, modelId)).build();
+	}
+	
+	@POST
+	@Path("/java-class")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiResponse(responseCode = "200", description = "Response", content = @Content(schema = @Schema(implementation = ModelJavaClassDTO.class)))
+	@RolesAllowed("admin")
+	public Response getJavaClassUpdate(
+			@Valid ModelJavaClassDTO modelJavaClassDTO
+		) {
+		return Response.ok(modelService.getJavaClassUpdate(modelJavaClassDTO)).build();
+	}
+	
+	@GET
+	@Path("/java-classes")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiResponse(responseCode = "200", description = "Response", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ComboboxDTO.class))))
+	@RolesAllowed("admin")
+	public Response getJavaClasses(
+		) {
+		return Response.ok(modelService.getJavaClasses()).build();
+	}
+	
+	@DELETE
+	@Path("/java-class/{id}")
+	@ApiResponse(responseCode = "204", description = "No content")
+	@RolesAllowed("admin")
+	public Response getJavaClassDelete(
+			@PathParam("id") Long id
+		) {
+		modelService.getJavaClassDelete(id);
 		return Response.noContent().build();
 	}
 

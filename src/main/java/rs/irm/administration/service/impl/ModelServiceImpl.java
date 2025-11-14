@@ -12,15 +12,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import rs.irm.administration.dto.CheckParentDTO;
+import rs.irm.administration.dto.JavaClassDTO;
 import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.dto.ModelJasperReportDTO;
+import rs.irm.administration.dto.ModelJavaClassDTO;
 import rs.irm.administration.dto.ModelProcedureDTO;
 import rs.irm.administration.dto.ModelTriggerDTO;
 import rs.irm.administration.dto.NextRowColumnDTO;
@@ -29,6 +33,7 @@ import rs.irm.administration.dto.RoleDTO;
 import rs.irm.administration.entity.Model;
 import rs.irm.administration.entity.ModelColumn;
 import rs.irm.administration.entity.ModelJasperReport;
+import rs.irm.administration.entity.ModelJavaClass;
 import rs.irm.administration.enums.ModelType;
 import rs.irm.administration.service.ModelService;
 import rs.irm.administration.utils.CreateModel;
@@ -397,14 +402,48 @@ public class ModelServiceImpl implements ModelService {
 
 	@Override
 	public ModelProcedureDTO getUpdateProcedure(ModelProcedureDTO modelProcedureDTO) {
-		ModelProcedureUpdate modelProcedureUpdate=new ModelProcedureUpdate(modelProcedureDTO, request);
+		ModelProcedureUpdate modelProcedureUpdate = new ModelProcedureUpdate(modelProcedureDTO, request);
 		return this.datatableService.executeMethodWithReturn(modelProcedureUpdate);
 	}
 
 	@Override
 	public void getProcedureDelete(Long id) {
-		ModelProcedureDelete modelProcedureDelete=new ModelProcedureDelete(id, this.request);
+		ModelProcedureDelete modelProcedureDelete = new ModelProcedureDelete(id, this.request);
 		this.datatableService.executeMethod(modelProcedureDelete);
+	}
+
+	@Override
+	public TableDataDTO<ModelJavaClassDTO> getJavaClassTable(TableParameterDTO tableParameterDTO, Long modelId) {
+		TableFilter tableFilter = new TableFilter();
+		tableFilter.setField("modelId");
+		tableFilter.setParameter1(String.valueOf(modelId));
+		tableFilter.setSearchOperation(SearchOperation.equals);
+		tableParameterDTO.getTableFilters().add(tableFilter);
+		return this.datatableService.getTableDataDTO(tableParameterDTO, ModelJavaClassDTO.class);
+	}
+
+	@Override
+	public ModelJavaClassDTO getJavaClassUpdate(ModelJavaClassDTO modelJavaClassDTO) {
+		ModelJavaClass modelJavaClass = modelJavaClassDTO.getId() != 0
+				? this.datatableService.findByExistingId(modelJavaClassDTO.getId(), ModelJavaClass.class)
+				: new ModelJavaClass();
+
+		new ModelMapper().map(modelJavaClassDTO, modelJavaClass);
+		modelJavaClass = this.datatableService.save(modelJavaClass);
+		return new ModelMapper().map(modelJavaClass, ModelJavaClassDTO.class);
+	}
+
+	@Override
+	public void getJavaClassDelete(Long id) {
+		ModelJavaClass modelJavaClass = this.datatableService.findByExistingId(id, ModelJavaClass.class);
+		this.datatableService.delete(modelJavaClass);
+
+	}
+
+	@Override
+	public List<ComboboxDTO> getJavaClasses() {
+		List<JavaClassDTO> javaClassDTOs = this.datatableService.findAll(new TableParameterDTO(), JavaClassDTO.class);
+		return javaClassDTOs.stream().map(a -> new ComboboxDTO(a.getId(), a.getName())).toList();
 	}
 
 }
