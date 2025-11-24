@@ -56,15 +56,15 @@ public class CustomServletContextListener implements ServletContextListener {
 
 		NotificationSocket.senderPool.shutdown();
 		NotificationSocket.sessionQueues.clear();
-		
+
 		try {
 			AppConnections.datatabeListener.close();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		
+
 		try {
-			if(AppConnections.checkConnection!=null) {
+			if (AppConnections.checkConnection != null) {
 				AppConnections.checkConnection.close();
 			}
 		} catch (Exception e) {

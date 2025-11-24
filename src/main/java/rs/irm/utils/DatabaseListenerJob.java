@@ -32,9 +32,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.dto.DashboardDTO;
 import rs.irm.administration.dto.DashboardRoleInfoDTO;
+import rs.irm.administration.dto.JavaClassDTO;
 import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.dto.ModelJasperReportDTO;
+import rs.irm.administration.dto.ModelJavaClassInfo;
 import rs.irm.administration.dto.ModelProcedureDTO;
 import rs.irm.administration.dto.ReportDTO;
 import rs.irm.administration.dto.ReportGroupDTO;
@@ -70,6 +72,9 @@ public class DatabaseListenerJob implements Job {
 	public final static String role_listener = "role_listen";
 	public final static String appuserrole_listener = "appuserrole_listen";
 	public final static String reportjasper_listener = "reportjasper_listen";
+	public final static String javaclass_listen = "javaclass_listen";
+	public final static String modeljavaclass_listen = "modeljavaclass_listen";
+
 	ExecutorService websocketSender = Executors.newFixedThreadPool(10);
 
 	DatatableService datatableService = new DatatableServiceImpl();
@@ -104,6 +109,8 @@ public class DatabaseListenerJob implements Job {
 				statement.execute("LISTEN " + role_listener);
 				statement.execute("LISTEN " + appuserrole_listener);
 				statement.execute("LISTEN " + reportjasper_listener);
+				statement.execute("LISTEN " + javaclass_listen);
+				statement.execute("LISTEN " + modeljavaclass_listen);
 				statement.close();
 			}
 			PGConnection pgConnection = AppConnections.datatabeListener.unwrap(PGConnection.class);
@@ -199,6 +206,18 @@ public class DatabaseListenerJob implements Job {
 					case modelprocedure_listener: {
 						ModelData.modelProcedureDTOs = this.datatableService.findAll(new TableParameterDTO(),
 								ModelProcedureDTO.class);
+						break;
+					}
+					case javaclass_listen: {
+						ModelData.javaClasses = this.datatableService.findAll(new TableParameterDTO(),
+								JavaClassDTO.class);
+						ModelData.modelJavaClassInfo = this.datatableService.findAll(new TableParameterDTO(),
+								ModelJavaClassInfo.class);
+						break;
+					}
+					case modeljavaclass_listen: {
+						ModelData.modelJavaClassInfo = this.datatableService.findAll(new TableParameterDTO(),
+								ModelJavaClassInfo.class);
 						break;
 					}
 					case appuser_listener: {

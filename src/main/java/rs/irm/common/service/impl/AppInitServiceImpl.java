@@ -45,9 +45,11 @@ import jakarta.persistence.UniqueConstraint;
 import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.dto.DashboardDTO;
 import rs.irm.administration.dto.DashboardRoleInfoDTO;
+import rs.irm.administration.dto.JavaClassDTO;
 import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.dto.ModelDTO;
 import rs.irm.administration.dto.ModelJasperReportDTO;
+import rs.irm.administration.dto.ModelJavaClassInfo;
 import rs.irm.administration.dto.ModelProcedureDTO;
 import rs.irm.administration.dto.ReportDTO;
 import rs.irm.administration.dto.ReportGroupDTO;
@@ -293,18 +295,20 @@ public class AppInitServiceImpl implements AppInitService {
 	public void initListener() {
 
 		String[] functionsFiles = new String[] { "notification_listener.sql", "model_listener.sql",
-				"modelcolumn_listener.sql", "modeljasperreport_listener.sql","reportgroup_listener.sql", "reportgrouprole_listener.sql",
-				"report_listener.sql", "dashboard_listener.sql", "dashboardrole_listener.sql", "reportjob_listener.sql",
-				"modelprocedure_listener.sql", "appuser_listen.sql", "role_listen.sql", "appuserrole_listen.sql", "reportjasper_listener.sql" };
+				"modelcolumn_listener.sql", "modeljasperreport_listener.sql", "reportgroup_listener.sql",
+				"reportgrouprole_listener.sql", "report_listener.sql", "dashboard_listener.sql",
+				"dashboardrole_listener.sql", "reportjob_listener.sql", "modelprocedure_listener.sql",
+				"appuser_listen.sql", "role_listen.sql", "appuserrole_listen.sql", "reportjasper_listener.sql",
+				"javaclass_listen.sql", "modeljavaclass_listen.sql" };
 
 		String[] tables = new String[] { "notification", "model", "modelcolumn", "modeljasperreport", "reportgroup",
 				"reportgroup_role", "report", "dashboard", "dashboard_role", "reportjob", "modelprocedure", "appuser",
-				"role", "appuser_role", "reportjasper" };
+				"role", "appuser_role", "reportjasper", "javaclass", "modeljavaclass" };
 
 		String[] triggers = new String[] { "listener_notification", "listener_model", "listener_modelcolumn",
-				"listener_modeljasperreport", "listener_reportgroup", "listener_reportgrouprole", "listener_report", "listener_dashboard",
-				"listener_dashboardrole", "listener_reportjob", "listener_modelprocedure", "listen_appuser",
-				"listen_role", "listen_appuserrole", "listener_reportjasper" };
+				"listener_modeljasperreport", "listener_reportgroup", "listener_reportgrouprole", "listener_report",
+				"listener_dashboard", "listener_dashboardrole", "listener_reportjob", "listener_modelprocedure",
+				"listen_appuser", "listen_role", "listen_appuserrole", "listener_reportjasper", "listen_javaclass", "listen_modeljavaclass" };
 
 		int index = -1;
 		for (String functionFile : functionsFiles) {
@@ -393,6 +397,8 @@ public class AppInitServiceImpl implements AppInitService {
 		ModelData.appUsers = this.datatableService.findAll(new TableParameterDTO(), AppUser.class);
 		ModelData.roles = this.datatableService.findAll(new TableParameterDTO(), Role.class);
 		ModelData.appUserRoles = this.datatableService.findAll(new TableParameterDTO(), AppUserRole.class);
+		ModelData.javaClasses = this.datatableService.findAll(new TableParameterDTO(), JavaClassDTO.class);
+		ModelData.modelJavaClassInfo = this.datatableService.findAll(new TableParameterDTO(), ModelJavaClassInfo.class);
 
 	}
 

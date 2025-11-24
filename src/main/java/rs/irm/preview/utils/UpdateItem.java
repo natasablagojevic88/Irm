@@ -13,8 +13,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.WebApplicationException;
 import rs.irm.administration.dto.ModelColumnDTO;
 import rs.irm.administration.dto.ModelDTO;
+import rs.irm.administration.dto.ModelJavaClassInfo;
 import rs.irm.administration.enums.ModelColumnType;
 import rs.irm.administration.enums.ModelType;
+import rs.irm.administration.enums.TriggerEvent;
+import rs.irm.administration.utils.ExecuteClass;
 import rs.irm.administration.utils.ModelData;
 import rs.irm.common.dto.ComboboxDTO;
 import rs.irm.common.enums.TrackAction;
@@ -64,6 +67,24 @@ public class UpdateItem implements ExecuteMethodWithReturn<LinkedHashMap<String,
 
 			id = modelQueryCreatorService.getInsert(this.modelID, item, this.parentId, connection);
 
+			Long finalId = id;
+
+			List<ModelJavaClassInfo> javaCodes = ModelData.modelJavaClassInfo.stream()
+					.filter(a -> a.getModelId().doubleValue() == this.modelID.doubleValue())
+					.filter(a -> a.getEvent().equals(TriggerEvent.INSERT)
+							|| a.getEvent().equals(TriggerEvent.INSERTORUPDATE))
+					.toList();
+			for (ModelJavaClassInfo javaClassInfo : javaCodes) {
+				ExecuteClass executeClass = new ExecuteClass(finalId, javaClassInfo.getJavaClassClassText(),
+						javaClassInfo.getJavaClassClassName(), javaClassInfo.getJavaClassMethodName());
+				
+				try {
+					executeClass.execute();
+				} catch (Exception e) {
+					throw new WebApplicationException(e);
+				}
+			}
+
 		} else {
 			LinkedHashMap<String, Object> existing = modelQueryCreatorService.findByExistingId(id, modelID, connection);
 
@@ -72,6 +93,24 @@ public class UpdateItem implements ExecuteMethodWithReturn<LinkedHashMap<String,
 			}
 
 			modelQueryCreatorService.getUpdate(this.modelID, this.item, TrackAction.UPDATE, connection);
+			
+			Long finalId = id;
+			
+			List<ModelJavaClassInfo> javaCodes = ModelData.modelJavaClassInfo.stream()
+					.filter(a -> a.getModelId().doubleValue() == this.modelID.doubleValue())
+					.filter(a -> a.getEvent().equals(TriggerEvent.UPDATE)
+							|| a.getEvent().equals(TriggerEvent.INSERTORUPDATE))
+					.toList();
+			for (ModelJavaClassInfo javaClassInfo : javaCodes) {
+				ExecuteClass executeClass = new ExecuteClass(finalId, javaClassInfo.getJavaClassClassText(),
+						javaClassInfo.getJavaClassClassName(), javaClassInfo.getJavaClassMethodName());
+				
+				try {
+					executeClass.execute();
+				} catch (Exception e) {
+					throw new WebApplicationException(e);
+				}
+			}
 
 		}
 
@@ -79,7 +118,8 @@ public class UpdateItem implements ExecuteMethodWithReturn<LinkedHashMap<String,
 	}
 
 	private ModelDTO findModelDTO(Long modelId) {
-		return ModelData.listModelDTOs.stream().filter(a -> a.getId().doubleValue() == modelId.doubleValue()).findFirst().get();
+		return ModelData.listModelDTOs.stream().filter(a -> a.getId().doubleValue() == modelId.doubleValue())
+				.findFirst().get();
 	}
 
 	private List<ModelColumnDTO> findColumn() {
@@ -137,11 +177,11 @@ public class UpdateItem implements ExecuteMethodWithReturn<LinkedHashMap<String,
 		List<ModelColumnDTO> notNullColumns = columns.stream().filter(a -> a.getNullable() == false).toList();
 
 		for (ModelColumnDTO columnDTO : notNullColumns) {
-			
-			if(columnDTO.getDisabled()) {
+
+			if (columnDTO.getDisabled()) {
 				continue;
 			}
-			
+
 			if (item.get(columnDTO.getCode()) == null) {
 				throw new FieldRequiredException(columnDTO.getName());
 			}
@@ -203,7 +243,7 @@ public class UpdateItem implements ExecuteMethodWithReturn<LinkedHashMap<String,
 
 		}
 	}
-	
+
 	private void checkListOfValues(Connection connection) {
 
 		LinkedHashMap<String, List<ComboboxDTO>> findListOfValue = this.modelQueryCreatorService

@@ -34,8 +34,9 @@ public class JavaClassServiceImpl implements JavaClassService {
 		JavaClass javaClass = javaClassDTO.getId() == 0 ? new JavaClass()
 				: this.datatableService.findByExistingId(javaClassDTO.getId(), JavaClass.class);
 		try {
+			String text=javaClassDTO.getClassText().replace("{id}", "0L");
 			SimpleCompiler sc = new SimpleCompiler();
-            sc.cook(javaClassDTO.getClassText()); 
+            sc.cook(text); 
 		}catch(Exception e) {
 			throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "wrongCode", e.getMessage());
 		}
