@@ -37,4 +37,8 @@
 		<url-pattern>/api/*</url-pattern>
 	</filter-mapping>
 
+	<listener>
+		<listener-class>org.apache.logging.log4j.web.Log4jServletContextListener</listener-class>
+	</listener>
+
 </web-app>

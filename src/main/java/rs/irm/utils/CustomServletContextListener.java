@@ -3,6 +3,7 @@ package rs.irm.utils;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Enumeration;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,6 +56,14 @@ public class CustomServletContextListener implements ServletContextListener {
 		}
 
 		NotificationSocket.senderPool.shutdown();
+		 try {
+		        if (!NotificationSocket.senderPool.awaitTermination(10, TimeUnit.SECONDS)) {
+		        	NotificationSocket.senderPool.shutdownNow();
+		        }
+		    } catch (InterruptedException e) {
+		    	NotificationSocket.senderPool.shutdownNow();
+		        Thread.currentThread().interrupt();
+		    }
 		NotificationSocket.sessionQueues.clear();
 
 		try {
