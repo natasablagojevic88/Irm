@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.irm.administration.enums.SqlMetric;
 import rs.irm.database.enums.SearchOperation;
+import rs.irm.database.enums.Text;
 
 @Setter
 @Getter
@@ -46,12 +47,13 @@ public class ReportFilter {
 	@Column(name="sqlmetric")
 	private SqlMetric sqlMetric;
 	
-	@Column(name="defaultvalue1",length = 4000)
+	@Column(name="defaultvalue1")
+	@Text
 	private String defaultValue1;
 	
-	@Column(name="defaultvalue2",length = 4000)
+	@Column(name="defaultvalue2")
+	@Text
 	private String defaultValue2;
-	
 	
 	@Column(name="fieldname",nullable = false)
 	private String fieldName;
@@ -62,13 +64,16 @@ public class ReportFilter {
 	@Column(name="leftjoinpath")
 	private String leftJoinPath;
 	
-	@Column(name="lefttabledatas",length = 4000)
+	@Column(name="lefttabledatas")
+	@Text
 	private String leftTableDatas;
 	
-	@Column(name="columnlist",length = 4000)
+	@Column(name="columnlist")
+	@Text
 	private String columnList;
 	
-	@Column(name="tablelist",length = 4000)
+	@Column(name="tablelist")
+	@Text
 	private String tableList;
 
 }

@@ -3,8 +3,14 @@ package rs.irm.preview.utils;
 import java.net.HttpURLConnection;
 import java.sql.Connection;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.WebApplicationException;
+import rs.irm.administration.dto.ModelJavaClassInfo;
+import rs.irm.administration.enums.TriggerEvent;
+import rs.irm.administration.utils.ExecuteClass;
+import rs.irm.administration.utils.ModelData;
 import rs.irm.common.exceptions.CommonException;
 import rs.irm.database.utils.ExecuteMethodWithReturn;
 import rs.irm.preview.service.ModelQueryCreatorService;
@@ -35,6 +41,21 @@ public class UnlockItem implements ExecuteMethodWithReturn<LinkedHashMap<String,
 			throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "parentIsLocked", null);
 		}
 		modelQueryCreatorService.getUnlock(modelId, id, connection);
+		
+		List<ModelJavaClassInfo> javaCodes = ModelData.modelJavaClassInfo.stream()
+				.filter(a -> a.getModelId().doubleValue() == this.modelId.doubleValue())
+				.filter(a -> a.getEvent().equals(TriggerEvent.UNLOCK))
+				.toList();
+		for (ModelJavaClassInfo javaClassInfo : javaCodes) {
+			ExecuteClass executeClass = new ExecuteClass(id, javaClassInfo.getJavaClassClassText(),
+					javaClassInfo.getJavaClassClassName(), javaClassInfo.getJavaClassMethodName());
+			
+			try {
+				executeClass.execute();
+			} catch (Exception e) {
+				throw new WebApplicationException(e);
+			}
+		}
 		return modelQueryCreatorService.findByExistingId(this.id, modelId, connection);
 	}
 

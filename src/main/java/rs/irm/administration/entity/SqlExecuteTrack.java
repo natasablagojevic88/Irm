@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import rs.irm.database.enums.Text;
 
 @Setter
 @Getter
@@ -24,7 +25,8 @@ public class SqlExecuteTrack {
 	@Column
 	private String ipaddress;
 	
-	@Column(name="sqlquery",nullable = false,length = 4000)
+	@Column(name="sqlquery",nullable = false)
+	@Text
 	private String sqlQuery;
 	
 	@Column(name="updatednumberofrows",nullable = false)

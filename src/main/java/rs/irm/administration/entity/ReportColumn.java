@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.irm.administration.enums.SqlMetric;
 import rs.irm.database.enums.SortDirection;
+import rs.irm.database.enums.Text;
 
 @Setter
 @Getter
@@ -60,13 +61,16 @@ public class ReportColumn {
 	@Column(name="leftjoinpath")
 	private String leftJoinPath;
 	
-	@Column(name="lefttabledatas",length = 4000)
+	@Column(name="lefttabledatas")
+	@Text
 	private String leftTableDatas;
 	
-	@Column(name="columnlist",length = 4000)
+	@Column(name="columnlist")
+	@Text
 	private String columnList;
 	
-	@Column(name="tablelist",length = 4000)
+	@Column(name="tablelist")
+	@Text
 	private String tableList;
 
 }

@@ -15,6 +15,7 @@ import lombok.Setter;
 import rs.irm.administration.enums.ReportJobFileType;
 import rs.irm.administration.enums.ReportJobMailType;
 import rs.irm.administration.enums.ReportJobType;
+import rs.irm.database.enums.Text;
 
 @Setter
 @Getter
@@ -64,7 +65,8 @@ public class ReportJob {
 	@Column(name="mailsubject")
 	private String mailSubject;
 	
-	@Column(name="mailbody",length = 4000)
+	@Column(name="mailbody")
+	@Text
 	private String mailBody;
 	
 	@Column(name="mailtype")

@@ -49,12 +49,15 @@ public class NotificationSocket {
 		Map<String, String> parameters = new HashMap<>();
 		if (request != null) {
 			Map<String, List<String>> headers = request.getHeaders();
-			List<String> cookieHeaders = headers.get("cookie");
+			List<String> cookieHeaders = headers.get("Cookie");
 			if (cookieHeaders != null) {
 				for (String cookieHeader : cookieHeaders) {
 					String[] splits = cookieHeader.split("\\;");
 					for (String cookieText : splits) {
 						String cookie[] = cookieText.split("\\=");
+						if(cookie.length<2) {
+							continue;
+						}
 						parameters.put(cookie[0].trim(), cookie[1].trim());
 					}
 				}

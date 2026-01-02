@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.irm.administration.enums.GraphType;
 import rs.irm.administration.enums.ReportType;
+import rs.irm.database.enums.Text;
 
 @Setter
 @Getter
@@ -53,7 +54,8 @@ public class Report {
 	@Column(name="graphtype")
 	private GraphType graphType;
 	
-	@Column(name="sqlquery",length = 4000)
+	@Column(name="sqlquery")
+	@Text
 	private String sqlQuery;
 	
 }

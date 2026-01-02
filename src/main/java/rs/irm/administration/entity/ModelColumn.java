@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.irm.administration.enums.ModelColumnType;
+import rs.irm.database.enums.Text;
 
 @Setter
 @Getter
@@ -71,10 +72,12 @@ public class ModelColumn {
 	@JoinColumn(nullable = true, foreignKey = @ForeignKey(name="fk_modelcolumn_parent"))
 	private ModelColumn parent;
 	
-	@Column(name="defaultvalue",nullable = true,length = 2000)
+	@Column(name="defaultvalue",nullable = true)
+	@Text
 	private String defaultValue;
 	
-	@Column(name="listofvalues",nullable = true,length = 4000)
+	@Column(name="listofvalues",nullable = true)
+	@Text
 	private String listOfValues;
 	
 	@Column(name="showintable",nullable = false)

@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.irm.administration.enums.JobStatement;
+import rs.irm.database.enums.Text;
 
 @Setter
 @Getter
@@ -39,7 +40,8 @@ public class JobLog {
 	@Column(name="endtime")
 	private LocalDateTime endTime;
 	
-	@Column(length = 4000)
+	@Column
+	@Text
 	private String error;
 	
 }
