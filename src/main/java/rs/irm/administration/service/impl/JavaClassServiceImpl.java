@@ -8,12 +8,15 @@ import org.modelmapper.ModelMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import rs.irm.administration.dto.JavaClassDTO;
+import rs.irm.administration.dto.ReportJobDTO;
 import rs.irm.administration.entity.JavaClass;
 import rs.irm.administration.service.JavaClassService;
 import rs.irm.common.exceptions.CommonException;
 import rs.irm.database.dto.TableDataDTO;
 import rs.irm.database.dto.TableParameterDTO;
+import rs.irm.database.enums.SearchOperation;
 import rs.irm.database.service.DatatableService;
+import rs.irm.database.utils.TableFilter;
 
 @Named
 public class JavaClassServiceImpl implements JavaClassService {
@@ -34,14 +37,14 @@ public class JavaClassServiceImpl implements JavaClassService {
 		JavaClass javaClass = javaClassDTO.getId() == 0 ? new JavaClass()
 				: this.datatableService.findByExistingId(javaClassDTO.getId(), JavaClass.class);
 		try {
-			String text=javaClassDTO.getClassText().replace("{id}", "0L");
+			String text = javaClassDTO.getClassText().replace("{id}", "0L");
 			SimpleCompiler sc = new SimpleCompiler();
-            sc.cook(text); 
-		}catch(Exception e) {
+			sc.cook(text);
+		} catch (Exception e) {
 			throw new CommonException(HttpURLConnection.HTTP_BAD_REQUEST, "wrongCode", e.getMessage());
 		}
 		modelMapper.map(javaClassDTO, javaClass);
-		javaClass=this.datatableService.save(javaClass);
+		javaClass = this.datatableService.save(javaClass);
 		return modelMapper.map(javaClass, JavaClassDTO.class);
 	}
 
@@ -49,7 +52,16 @@ public class JavaClassServiceImpl implements JavaClassService {
 	public void getDelete(Long id) {
 		JavaClass javaClass = this.datatableService.findByExistingId(id, JavaClass.class);
 		this.datatableService.delete(javaClass);
+
+	}
+
+	@Override
+	public TableDataDTO<ReportJobDTO> getJobList(Long id, TableParameterDTO tableParameterDTO) {
+		tableParameterDTO.getTableFilters()
+				.add(new TableFilter("javaClassId", SearchOperation.equals, String.valueOf(id), null));
 		
+		
+		return this.datatableService.getTableDataDTO(tableParameterDTO, ReportJobDTO.class);
 	}
 
 }

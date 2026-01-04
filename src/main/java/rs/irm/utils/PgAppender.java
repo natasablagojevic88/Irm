@@ -23,24 +23,23 @@ import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 
-@Plugin(category = Core.CATEGORY_NAME, name = "PgAppender", elementType=Appender.ELEMENT_TYPE)
-public class PgAppender extends AbstractAppender{
+@Plugin(category = Core.CATEGORY_NAME, name = "PgAppender", elementType = Appender.ELEMENT_TYPE)
+public class PgAppender extends AbstractAppender {
 	Logger logger = LogManager.getLogger(PgAppender.class);
-
 
 	public PgAppender(String name, Filter filter, Layout<? extends Serializable> layout, boolean ignoreExceptions,
 			Property[] properties) {
 		super(name, filter, layout, ignoreExceptions, properties);
 		this.checkConnection();
 	}
-	
+
 	private void checkConnection() {
 		try {
 			try {
 				Statement statement = AppConnections.logConnection.createStatement();
 				statement.execute(AppParameters.checkconnection);
 				statement.close();
-			} catch(Exception e) {
+			} catch (Exception e) {
 				Context initContext = new InitialContext();
 				Context envContext = (Context) initContext.lookup("java:/comp/env");
 				DataSource dataSource = (DataSource) envContext.lookup("jdbc/postgres");
@@ -48,31 +47,33 @@ public class PgAppender extends AbstractAppender{
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-		} 
+		}
 	}
-	
+
 	@PluginFactory
-	public static PgAppender createAppender(
-			@PluginAttribute("name") String name
-			) {
+	public static PgAppender createAppender(@PluginAttribute("name") String name) {
 		return new PgAppender(name, null, null, true, null);
 	}
 
 	@Override
 	public void append(LogEvent event) {
 		checkConnection();
-		StackTraceElement[] stackTraceElements= event.getThrown().getStackTrace();
-		StringBuilder stringBuilder=new StringBuilder();
-		for(StackTraceElement stackTraceElement:stackTraceElements) {
-			stringBuilder.append(stackTraceElement.toString()+"\n");
+
+		StringBuilder stringBuilder = new StringBuilder();
+
+		if (event.getThrown() != null) {
+			StackTraceElement[] stackTraceElements = event.getThrown().getStackTrace();
+
+			for (StackTraceElement stackTraceElement : stackTraceElements) {
+				stringBuilder.append(stackTraceElement.toString() + "\n");
+			}
 		}
-		
-		String insertToApplog="INSERT INTO app_logs\n"
-				+ "(event_date, level, logger, thread, message, trace)\n"
+
+		String insertToApplog = "INSERT INTO app_logs\n" + "(event_date, level, logger, thread, message, trace)\n"
 				+ "VALUES(?,?,?,?,?,?)";
-		
+
 		try {
-			PreparedStatement preparedStatement=AppConnections.logConnection.prepareStatement(insertToApplog);
+			PreparedStatement preparedStatement = AppConnections.logConnection.prepareStatement(insertToApplog);
 			preparedStatement.setObject(1, new Timestamp(event.getTimeMillis()));
 			preparedStatement.setObject(2, event.getLevel().name());
 			preparedStatement.setObject(3, event.getLoggerName());
@@ -84,11 +85,7 @@ public class PgAppender extends AbstractAppender{
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		}
-		
+
 	}
-
-	
-
-	
 
 }

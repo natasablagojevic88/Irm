@@ -7,11 +7,13 @@ import java.time.LocalDateTime;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.janino.SimpleCompiler;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import jakarta.ws.rs.WebApplicationException;
+import rs.irm.administration.dto.JavaClassDTO;
 import rs.irm.administration.dto.ReportDTO;
 import rs.irm.administration.dto.ReportJobDTO;
 import rs.irm.administration.dto.ReportJobSessionDTO;
@@ -117,7 +119,7 @@ public class ExecuteReportJob implements Job {
 	}
 
 	private File runJob(ReportJobDTO reportJobDTO, ReportDTO reportDTO) {
-		String reportType = reportDTO==null?"MODEL":reportDTO.getType();
+		String reportType = reportDTO == null ? (reportJobDTO.getJavaClassId()==null?"MODEL" :"JAVACLASS") : reportDTO.getType();
 
 		switch (reportType) {
 		case "STANDARD": {
@@ -143,6 +145,21 @@ public class ExecuteReportJob implements Job {
 		case "MODEL": {
 			ExecuteImportReportJob executeImportReportJob = new ExecuteImportReportJob(reportJobDTO);
 			datatableService.executeMethod(executeImportReportJob);
+			return null;
+		}
+		case "JAVACLASS": {
+			SimpleCompiler compiler = new SimpleCompiler();
+			JavaClassDTO javaClassDTO=ModelData.javaClasses.stream().filter(a->a.getId().doubleValue()==reportJobDTO.getJavaClassId().doubleValue())
+					.findFirst().orElse(null);
+	        try {
+				compiler.cook(javaClassDTO.getClassText());
+
+				Class<?> clazz = compiler.getClassLoader().loadClass(javaClassDTO.getClassName());
+				Object obj = clazz.getDeclaredConstructor().newInstance(); 
+				clazz.getMethod(javaClassDTO.getMethodName()).invoke(obj);
+			} catch (Exception e) {
+				throw new WebApplicationException(e);
+			} 
 			return null;
 		}
 		}

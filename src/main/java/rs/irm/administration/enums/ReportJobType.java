@@ -5,5 +5,6 @@ public enum ReportJobType {
 	MAIL,
 	EXECUTE,
 	TRANSFER,
-	IMPORT
+	IMPORT,
+	JAVACLASS
 }

@@ -60,5 +60,18 @@ public class JavaClassController {
 		this.javaClassService.getDelete(id);
 		return Response.noContent().build();
 	}
+	
+	@POST
+	@Path("/job-list/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiResponse(responseCode = "200",description = "Response", content = @Content(schema = @Schema(implementation = TableDataDTO.class)))
+	@RolesAllowed("admin")
+	public Response getJobList(
+			TableParameterDTO tableParameterDTO,
+			@PathParam(value = "id") Long id
+			) {
+		return Response.ok(javaClassService.getJobList(id,tableParameterDTO)).build();
+	}
 
 }

@@ -96,4 +96,8 @@ public class ReportJob {
 	
 	@Column(name="parentquery")
 	private String parentQuery;
+	
+	@JoinColumn(name="javaclass", foreignKey = @ForeignKey(name="fk_reportjob_javaclass"))
+	@ManyToOne(cascade = CascadeType.REMOVE)
+	private JavaClass javaClass;
 }

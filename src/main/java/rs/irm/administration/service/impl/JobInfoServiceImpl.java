@@ -56,14 +56,14 @@ public class JobInfoServiceImpl implements JobInfoService {
 
 	@Inject
 	private CommonService commonService;
-	
+
 	@Inject
 	private ReportService reportService;
-	
+
 	@Inject
 	private DatatableService datatableService;
-	
-	private ModelMapper modelMapper=new ModelMapper();
+
+	private ModelMapper modelMapper = new ModelMapper();
 
 	@Override
 	public TableDataDTO<JobInfoDTO> getList() {
@@ -99,7 +99,7 @@ public class JobInfoServiceImpl implements JobInfoService {
 
 		List<JobInfoDTO> jobInfoDTOs = new ArrayList<>();
 		try {
-			if(AppInitServiceImpl.scheduler!=null) {
+			if (AppInitServiceImpl.scheduler != null) {
 				Set<JobKey> setOfKeys = AppInitServiceImpl.scheduler
 						.getJobKeys(GroupMatcher.groupEquals(LoadReportJobServiceImpl.jobGroup));
 
@@ -122,8 +122,8 @@ public class JobInfoServiceImpl implements JobInfoService {
 
 	private JobInfoDTO createJobInfoDTO(JobKey jobKey) {
 		JobInfoDTO jobInfoDTO = new JobInfoDTO();
-		
-		if(AppInitServiceImpl.scheduler==null) {
+
+		if (AppInitServiceImpl.scheduler == null) {
 			return jobInfoDTO;
 		}
 
@@ -132,8 +132,8 @@ public class JobInfoServiceImpl implements JobInfoService {
 
 		jobInfoDTO.setId(reportJobDTO.getId());
 		jobInfoDTO.setName(reportJobDTO.getName());
-		ReportJobType reportJobType=ReportJobType.valueOf(reportJobDTO.getType());
-		jobInfoDTO.setType(resourceBundleService.getText("ReportJobType."+reportJobType.name(), null));
+		ReportJobType reportJobType = ReportJobType.valueOf(reportJobDTO.getType());
+		jobInfoDTO.setType(resourceBundleService.getText("ReportJobType." + reportJobType.name(), null));
 		jobInfoDTO.setReportName(reportJobDTO.getReportName());
 		jobInfoDTO.setActive(reportJobDTO.getActive());
 
@@ -192,11 +192,11 @@ public class JobInfoServiceImpl implements JobInfoService {
 				.filter(a -> a.getId().doubleValue() == id.doubleValue()).findFirst().get();
 
 		try {
-			if(AppInitServiceImpl.scheduler!=null) {
+			if (AppInitServiceImpl.scheduler != null) {
 				AppInitServiceImpl.scheduler
-				.triggerJob(new JobKey(reportJobDTO.getName(), LoadReportJobServiceImpl.jobGroup));
+						.triggerJob(new JobKey(reportJobDTO.getName(), LoadReportJobServiceImpl.jobGroup));
 			}
-			
+
 		} catch (SchedulerException e) {
 			throw new WebApplicationException(e);
 		}
@@ -227,35 +227,38 @@ public class JobInfoServiceImpl implements JobInfoService {
 	public JobInfoDTO getJobInfo(Long id) {
 		ReportJobDTO reportJobDTO = ModelData.listReportJobDTOs.stream()
 				.filter(a -> a.getId().doubleValue() == id.doubleValue()).findFirst().get();
-		
-		JobKey jobKey=new JobKey(reportJobDTO.getName(), LoadReportJobServiceImpl.jobGroup);
-		
+
+		JobKey jobKey = new JobKey(reportJobDTO.getName(), LoadReportJobServiceImpl.jobGroup);
+
 		return createJobInfoDTO(jobKey);
 	}
 
 	@Override
 	public JobEditInfoDTO getJobEditInfo(Long id) {
-		ReportJob reportJob=this.datatableService.findByExistingId(id, ReportJob.class);
-		JobEditInfoDTO jobEditInfoDTO=new JobEditInfoDTO();
+		ReportJob reportJob = this.datatableService.findByExistingId(id, ReportJob.class);
+		JobEditInfoDTO jobEditInfoDTO = new JobEditInfoDTO();
 		jobEditInfoDTO.setReportJobDTO(modelMapper.map(reportJob, ReportJobDTO.class));
-		jobEditInfoDTO.setReportType(reportJob.getReport()==null?"MODEL":reportJob.getReport().getType().name());
+		jobEditInfoDTO.setReportType(
+				reportJob.getReport() == null ? (reportJob.getJavaClass() == null ? "MODEL" : "JAVACLASS")
+						: reportJob.getReport().getType().name());
 		jobEditInfoDTO.setNames(commonService.classToNames(ReportJobDTO.class));
 		jobEditInfoDTO.setReportJobTypeList(commonService.enumToCombobox(ReportJobType.class));
 		jobEditInfoDTO.setReportJobFileTypeList(commonService.enumToCombobox(ReportJobFileType.class));
 		jobEditInfoDTO.setListSmtp(reportService.getSmtpBox());
 		jobEditInfoDTO.setReportJobMailType(commonService.enumToCombobox(ReportJobMailType.class));
-		
-		if(reportJob.getModel()!=null) {
+
+		if (reportJob.getModel() != null) {
 			jobEditInfoDTO.getNames().put("fileName", resourceBundleService.getText("fileNameStartWith", null));
 		}
-		
+
 		return jobEditInfoDTO;
 	}
 
 	@Override
-	public TableDataDTO<JobLogDTO> getLogs(TableParameterDTO tableParameterDTO,Long reportJobId) {
-		tableParameterDTO.getTableFilters().add(new TableFilter("reportJobId", SearchOperation.equals, String.valueOf(reportJobId), null));
-		
+	public TableDataDTO<JobLogDTO> getLogs(TableParameterDTO tableParameterDTO, Long reportJobId) {
+		tableParameterDTO.getTableFilters()
+				.add(new TableFilter("reportJobId", SearchOperation.equals, String.valueOf(reportJobId), null));
+
 		return this.datatableService.getTableDataDTO(tableParameterDTO, JobLogDTO.class);
 	}
 }

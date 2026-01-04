@@ -95,4 +95,7 @@ public class ReportJobDTO {
 	
 	@TableHide
 	private String parentQuery;
+	
+	@TableHide
+	private Long javaClassId;
 }
