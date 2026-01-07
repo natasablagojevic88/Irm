@@ -720,7 +720,7 @@ public class ModelQueryCreatorServiceImpl implements ModelQueryCreatorService {
 					stringBuilder.append("||' - '||");
 					stringBuilder.append("coalesce("+column.getCode()+"::TEXT,'')");
 				}
-				stringBuilder.append(" from " + modelDTO.getCode() + " order by 2");
+				stringBuilder.append(" from " + modelDTO.getCode() + " order by code");
 
 				String query = stringBuilder.toString();
 				try {
@@ -781,7 +781,7 @@ public class ModelQueryCreatorServiceImpl implements ModelQueryCreatorService {
 				}
 				stringBuilder.append(" from " + modelColumnDTO.getCodebookModelCode() + " ");
 				stringBuilder.append("where " + parent.getCodebookModelCode() + "=" + codebookValue + " ");
-				stringBuilder.append("order by 2");
+				stringBuilder.append("order by code");
 				System.out.println(stringBuilder.toString());
 				try {
 					Statement statement = connection.createStatement();
