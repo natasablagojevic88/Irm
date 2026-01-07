@@ -92,6 +92,10 @@ public class ModelColumnDTO {
 	@TableHide
 	private Boolean disabled;
 	
+	@NotNull
+	@TableHide
+	private Boolean description;
+	
 	@TableHide
 	private String eventFunction;
 }

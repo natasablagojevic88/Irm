@@ -132,7 +132,8 @@ public class ModelQueryCreatorServiceImpl implements ModelQueryCreatorService {
 	}
 
 	private ModelDTO findModel(Long modelId) {
-		return ModelData.listModelDTOs.stream().filter(a -> a.getId().doubleValue() == modelId.doubleValue()).findFirst().get();
+		return ModelData.listModelDTOs.stream().filter(a -> a.getId().doubleValue() == modelId.doubleValue())
+				.findFirst().get();
 	}
 
 	private List<ModelColumnDTO> findColumns(Long modelId) {
@@ -603,16 +604,16 @@ public class ModelQueryCreatorServiceImpl implements ModelQueryCreatorService {
 		modelColumnDTO.setNullable(false);
 		modelColumnDTO.setRowNumber(max + 1);
 		list.add(modelColumnDTO);
-		
+
 		modelColumnDTO = new ModelColumnDTO();
 		modelColumnDTO.setCode("lock");
 		modelColumnDTO.setColspan(1);
-		modelColumnDTO.setColumnNumber(modelDTO.getColumnsNumber()==1?1:2);
+		modelColumnDTO.setColumnNumber(modelDTO.getColumnsNumber() == 1 ? 1 : 2);
 		modelColumnDTO.setColumnType(ModelColumnType.BOOLEAN.name());
 		modelColumnDTO.setDisabled(true);
 		modelColumnDTO.setName(resourceBundleService.getText("lock", null));
 		modelColumnDTO.setNullable(false);
-		modelColumnDTO.setRowNumber(modelDTO.getColumnsNumber()==1?(max+2):(max+1));
+		modelColumnDTO.setRowNumber(modelDTO.getColumnsNumber() == 1 ? (max + 2) : (max + 1));
 		list.add(modelColumnDTO);
 
 		return list;
@@ -621,12 +622,13 @@ public class ModelQueryCreatorServiceImpl implements ModelQueryCreatorService {
 
 	private List<TableButton> getSubmodelsTable(Long modelId) {
 		List<TableButton> tableButtons = new ArrayList<>();
-		
-		ModelDTO model=findModel(modelId);
+
+		ModelDTO model = findModel(modelId);
 
 		List<ModelDTO> submodels = ModelData.listModelDTOs.stream().filter(a -> a.getParentId() != null)
-				.filter(a -> a.getParentId().doubleValue() == modelId.doubleValue()).filter(a -> a.getType().equals(ModelType.TABLE.name()))
-				.sorted(Comparator.comparing(ModelDTO::getName)).toList();
+				.filter(a -> a.getParentId().doubleValue() == modelId.doubleValue())
+				.filter(a -> a.getType().equals(ModelType.TABLE.name())).sorted(Comparator.comparing(ModelDTO::getName))
+				.toList();
 
 		for (ModelDTO modelDTO : submodels) {
 			TableButton tableButton = new TableButton();
@@ -643,8 +645,8 @@ public class ModelQueryCreatorServiceImpl implements ModelQueryCreatorService {
 		}
 
 		List<ModelJasperReportDTO> jaspers = ModelData.listModelJasperReportDTOs.stream()
-				.filter(a -> a.getModelId().doubleValue() == modelId.doubleValue()).sorted(Comparator.comparing(ModelJasperReportDTO::getName))
-				.toList();
+				.filter(a -> a.getModelId().doubleValue() == modelId.doubleValue())
+				.sorted(Comparator.comparing(ModelJasperReportDTO::getName)).toList();
 
 		for (ModelJasperReportDTO jasperReportDTO : jaspers) {
 			TableButton tableButton = new TableButton();
@@ -654,13 +656,12 @@ public class ModelQueryCreatorServiceImpl implements ModelQueryCreatorService {
 			tableButton.setName(resourceBundleService.getText(jasperReportDTO.getName(), null));
 			tableButtons.add(tableButton);
 		}
-		
-		List<ModelProcedureDTO> procedureDTOs=ModelData.modelProcedureDTOs.stream()
-				.filter(a->a.getModelId().doubleValue()==modelId.doubleValue())
-				.sorted(Comparator.comparing(ModelProcedureDTO::getName))
-				.toList();
-		
-		for(ModelProcedureDTO modelProcedureDTO:procedureDTOs) {
+
+		List<ModelProcedureDTO> procedureDTOs = ModelData.modelProcedureDTOs.stream()
+				.filter(a -> a.getModelId().doubleValue() == modelId.doubleValue())
+				.sorted(Comparator.comparing(ModelProcedureDTO::getName)).toList();
+
+		for (ModelProcedureDTO modelProcedureDTO : procedureDTOs) {
 			TableButton tableButton = new TableButton();
 			tableButton.setCode("/procedure/" + modelProcedureDTO.getId());
 			tableButton.setColor("Fuchsia");
@@ -700,11 +701,28 @@ public class ModelQueryCreatorServiceImpl implements ModelQueryCreatorService {
 
 			String code = modelColumnDTO.getCode();
 			ModelDTO modelDTO = findModel(modelColumnDTO.getCodebookModelId());
-			if (modelDTO.getParentType().equals(ModelType.TABLE.name())||modelColumnDTO.getDisabled()) {
+			if (modelDTO.getParentType().equals(ModelType.TABLE.name()) || modelColumnDTO.getDisabled()) {
 				hashMap.put(code, new ArrayList<>());
 			} else {
 				List<ComboboxDTO> list = new ArrayList<>();
-				String query = "select id,code from " + modelDTO.getCode() + " order by 2";
+				StringBuilder stringBuilder = new StringBuilder();
+				stringBuilder.append("select id,code");
+				List<ModelColumnDTO> codebooksColumns = ModelData.listColumnDTOs.stream()
+						.filter(a -> a.getModelId().doubleValue() == modelColumnDTO.getCodebookModelId().doubleValue())
+						.sorted(Comparator.comparing(ModelColumnDTO::getRowNumber)
+								.thenComparing(Comparator.comparing(ModelColumnDTO::getColumnNumber))
+								)
+						.toList();
+				for (ModelColumnDTO column : codebooksColumns) {
+					if (!column.getDescription()) {
+						continue;
+					}
+					stringBuilder.append("||' - '||");
+					stringBuilder.append("coalesce("+column.getCode()+"::TEXT,'')");
+				}
+				stringBuilder.append(" from " + modelDTO.getCode() + " order by 2");
+
+				String query = stringBuilder.toString();
 				try {
 					Statement statement = connection.createStatement();
 					ResultSet resultSet = statement.executeQuery(query);
@@ -746,13 +764,28 @@ public class ModelQueryCreatorServiceImpl implements ModelQueryCreatorService {
 			ModelColumnDTO modelColumnDTO = findSubCodebook.get(0);
 			subCodebookInfoDTO.setCodebook(modelColumnDTO.getCode());
 			if (codebookValue != -1) {
-				String query = "select id, code from " + modelColumnDTO.getCodebookModelCode() + " ";
-				query += "where " + parent.getCodebookModelCode() + "=" + codebookValue + " ";
-				query += "order by 2";
-
+				StringBuilder stringBuilder=new StringBuilder();
+				stringBuilder.append("select id, code");
+				List<ModelColumnDTO> columnDTOs=ModelData.listColumnDTOs
+						.stream().filter(a->a.getModelId().doubleValue()==modelColumnDTO.getCodebookModelId().doubleValue())
+						.sorted(Comparator.comparing(ModelColumnDTO::getRowNumber)
+								.thenComparing(Comparator.comparing(ModelColumnDTO::getColumnNumber))
+								)
+						.toList();
+				for(ModelColumnDTO columnDTO:columnDTOs) {
+					if(!columnDTO.getDescription()) {
+						continue;
+					}
+					stringBuilder.append("|| ' - '||");
+					stringBuilder.append("coalesce("+columnDTO.getCode()+"::TEXT,'')");
+				}
+				stringBuilder.append(" from " + modelColumnDTO.getCodebookModelCode() + " ");
+				stringBuilder.append("where " + parent.getCodebookModelCode() + "=" + codebookValue + " ");
+				stringBuilder.append("order by 2");
+				System.out.println(stringBuilder.toString());
 				try {
 					Statement statement = connection.createStatement();
-					ResultSet resultSet = statement.executeQuery(query);
+					ResultSet resultSet = statement.executeQuery(stringBuilder.toString());
 					List<ComboboxDTO> list = new ArrayList<>();
 					while (resultSet.next()) {
 						list.add(new ComboboxDTO(resultSet.getObject(1), resultSet.getObject(2).toString()));

@@ -86,6 +86,9 @@ public class ModelColumn {
 	@Column(nullable = false)
 	private Boolean disabled;
 	
+	@Column(nullable = false)
+	private Boolean description;
+	
 	@Column(name="eventfunction")
 	private String eventFunction;
 }
