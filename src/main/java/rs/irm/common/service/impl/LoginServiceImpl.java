@@ -119,8 +119,10 @@ public class LoginServiceImpl implements LoginService {
 				.add(new TableFilter("sessionToken", SearchOperation.equals, commonService.getSession(), null));
 		List<TokenDatabase> tokenDatabaseDTOs = this.datatableService.findAll(tableParameterDTO, TokenDatabase.class);
 
-		TokenDatabase tokenDatabaseDTO = tokenDatabaseDTOs.get(0);
-		this.insertTokenToBase(tokenDatabaseDTO.getId(), tokenDatabaseDTO.getAppUser(), false);
+		if(!tokenDatabaseDTOs.isEmpty()) {
+			TokenDatabase tokenDatabaseDTO = tokenDatabaseDTOs.get(0);
+			this.insertTokenToBase(tokenDatabaseDTO.getId(), tokenDatabaseDTO.getAppUser(), false);
+		}
 
 		servletResponse.addCookie(createCookie("session", null, 0));
 		servletResponse.addCookie(createCookie("refresh_token", null, 0));
